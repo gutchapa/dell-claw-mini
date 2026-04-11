@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "castv2-client": "^1.2.0",
+    "node-llama-cpp": "^3.18.1"
+  }
+}
