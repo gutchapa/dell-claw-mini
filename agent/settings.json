@@ -1,0 +1,9 @@
+{
+  "defaultModel": "kimi-k2-thinking",
+  "defaultProvider": "kimi-coding",
+  "lastChangelogVersion": "0.66.1",
+  "defaultThinkingLevel": "medium",
+  "packages": [
+    "https://github.com/davebcn87/pi-autoresearch"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "sessions": {
+    "e8d33319-81c8-4a40-a081-e36be7781e7b": {
+      "sessionId": "e8d33319-81c8-4a40-a081-e36be7781e7b",
+      "cwd": "/home/dell/.openclaw/workspace",
+      "sessionFile": "/home/dell/.pi/agent/sessions/--home-dell-.openclaw-workspace--/2026-04-05T07-19-10-530Z_e8d33319-81c8-4a40-a081-e36be7781e7b.jsonl",
+      "updatedAt": "2026-04-05T07:19:29.706Z"
+    },
+    "da99a19a-8b6e-4192-93c2-0761daf8310a": {
+      "sessionId": "da99a19a-8b6e-4192-93c2-0761daf8310a",
+      "cwd": "/home/dell/.openclaw/workspace",
+      "sessionFile": "/home/dell/.pi/agent/sessions/--home-dell-.openclaw-workspace--/2026-04-05T08-25-40-391Z_da99a19a-8b6e-4192-93c2-0761daf8310a.jsonl",
+      "updatedAt": "2026-04-05T08:25:59.093Z"
+    },
+    "cc05016c-fa40-448f-a360-9a54aed794df": {
+      "sessionId": "cc05016c-fa40-448f-a360-9a54aed794df",
+      "cwd": "/home/dell/.openclaw/workspace",
+      "sessionFile": "/home/dell/.pi/agent/sessions/--home-dell-.openclaw-workspace--/2026-04-05T11-54-53-264Z_cc05016c-fa40-448f-a360-9a54aed794df.jsonl",
+      "updatedAt": "2026-04-05T11:55:12.935Z"
+    }
+  }
+}

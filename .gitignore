@@ -1,1 +1,27 @@
-node_modules/
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+dist/
+build/
+
+# Secrets
+.env
+
+# RunPod / Flash
+.flash/
+.runpod/
+_gpu_bench_remote.py
+benchmarks/_run_all_evals.py
+
+# Research artifacts
+*.html
+
+# Social media drafts
+t/
+
+# OS
+.DS_Store
+*.jsonl.bak
+agent/sessions*/

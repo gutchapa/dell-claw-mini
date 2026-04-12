@@ -1,0 +1,28 @@
+{
+  "providers": {
+    "kimi-coding": {
+      "baseUrl": "https://api.kimi.com/coding/",
+      "api": "anthropic-messages",
+      "apiKey": "sk-kimi-l0Ju2tcVDDPnhM1YwyYls2k3I4n8RVhnNNIs32EfDmLSmqeGLoSgXxHuxshjWNqo",
+      "models": [
+        {
+          "id": "kimi-k2-thinking",
+          "name": "Kimi Code",
+          "reasoning": true,
+          "input": ["text", "image"],
+          "contextWindow": 262144,
+          "maxTokens": 32768
+        }
+      ]
+    },
+    "ollama": {
+      "baseUrl": "http://localhost:11434",
+      "api": "ollama",
+      "apiKey": "local",
+      "models": [
+        { "id": "tinydolphin", "name": "TinyDolphin Local" },
+        { "id": "gemma3:1b", "name": "Gemma 3 1B" }
+      ]
+    }
+  }
+}

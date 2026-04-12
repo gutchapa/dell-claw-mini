@@ -1,0 +1,46 @@
+{
+  "providers": {
+    "kimi-coding": {
+      "api": "anthropic-messages",
+      "apiKey": "sk-kimi-l0Ju2tcVDDPnhM1YwyYls2k3I4n8RVhnNNIs32EfDmLSmqeGLoSgXxHuxshjWNqo",
+      "baseUrl": "https://api.kimi.com/coding/",
+      "models": [
+        {
+          "contextWindow": 262144,
+          "id": "kimi-code",
+          "input": ["text", "image"],
+          "name": "Kimi Code",
+          "reasoning": true
+        }
+      ]
+    },
+    "phi3-local": {
+      "api": "ollama",
+      "apiKey": "ollama",
+      "baseUrl": "http://localhost:11434/v1",
+      "models": [
+        {
+          "contextWindow": 4096,
+          "id": "phi3:mini",
+          "input": ["text"],
+          "name": "Phi-3 Mini (Local)",
+          "reasoning": true
+        }
+      ]
+    },
+    "tinydolphin-local": {
+      "api": "ollama",
+      "apiKey": "ollama",
+      "baseUrl": "http://localhost:11434/v1",
+      "models": [
+        {
+          "contextWindow": 2048,
+          "id": "tinydolphin:latest",
+          "input": ["text"],
+          "name": "TinyDolphin (Local)",
+          "reasoning": false
+        }
+      ]
+    }
+  }
+}
