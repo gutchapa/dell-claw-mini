@@ -153,6 +153,13 @@ ollama pull nomic-embed-text
 
 log "✅ Ollama ready with Metal GPU acceleration!"
 
+# Optional: Pull other models
+log "📦 Pulling additional models (this will take time)..."
+if [ -f "$HOME/.openclaw/workspace/pull-ollama-models.sh" ]; then
+    log "  → Running model pull script..."
+    bash "$HOME/.openclaw/workspace/pull-ollama-models.sh" || warn "Some models failed to pull"
+fi
+
 # Setup GBrain
 if [ -d "$HOME/gbrain-repo" ]; then
     log "🧠 Setting up GBrain..."
