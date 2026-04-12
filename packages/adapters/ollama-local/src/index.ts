@@ -1,0 +1,1 @@
+export type { OllamaLocalAdapterConfig } from "./types.js";
