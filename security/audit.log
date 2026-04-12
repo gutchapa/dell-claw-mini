@@ -1,0 +1,2 @@
+[2026-04-12 20:13:38] [CRITICAL] Agent 'coder' attempted: rm -rf /tmp/test
+[2026-04-12 20:13:43] [HIGH] Dangerous pattern in mcp_bridge.py
