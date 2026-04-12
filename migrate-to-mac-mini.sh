@@ -194,6 +194,21 @@ if [ -d "$HOME/paperclip-fork" ]; then
     fi
 fi
 
+# Create MLX server script
+log "📝 Creating MLX server script..."
+cat > "$HOME/.openclaw/workspace/mlx-server.sh" << 'EOF'
+#!/bin/bash
+# MLX Server for Mac Mini M4 - FASTEST performance on Apple Silicon
+# Usage: ./mlx-server.sh [model_name]
+
+MODEL=${1:-"mlx-community/Qwen2.5-Coder-14B-Instruct-4bit"}
+echo "🚀 Starting MLX server with $MODEL"
+echo "📡 API endpoint: http://localhost:8080"
+echo "⚡ This uses Apple's Metal GPU - fastest on M4!"
+python3 -m mlx_lm.server --model "$MODEL" --trust-remote-code
+EOF
+chmod +x "$HOME/.openclaw/workspace/mlx-server.sh"
+
 # Create convenience script
 log "📝 Creating convenience scripts..."
 
@@ -229,6 +244,7 @@ echo ""
 echo "Installed Components:"
 echo "  ✅ GBrain (38 pages, 81 chunks)"
 echo "  ✅ Ollama with Metal GPU"
+echo "  ✅ MLX (Apple's native ML - FASTEST on M4!)"
 echo "  ✅ nomic-embed-text model"
 echo "  ✅ OpenClaw workspace"
 echo "  ✅ Pi Agent config"
@@ -240,6 +256,7 @@ echo "Quick Commands:"
 echo "  cd ~/gbrain-repo && bun run src/cli.ts query 'your question'"
 echo "  ollama list"
 echo "  ollama run qwen2.5-coder:0.5b"
+echo "  ~/.openclaw/workspace/mlx-server.sh  # MLX (fastest!)"
 echo ""
 echo "⚠️  ACTION REQUIRED:"
 echo "  1. Copy your .env file from old machine to ~/.openclaw/workspace/.env"
