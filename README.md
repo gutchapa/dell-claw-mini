@@ -1,61 +1,79 @@
-# OpenClaw Infrastructure
+# Dell Claw Mini — Workspace Archive
 
-This repository contains infrastructure scripts and configurations for deploying OpenClaw on a Dell Mini PC.
+Complete OpenClaw workspace for Dell Mini PC, ready for migration to Mac Mini M4.
 
-## 🖥️ Dell Mini PC Provisioning
+## 📦 What's Inside
 
-### Script: `infrastructure/deploy_dell.sh`
+| Category | Files | Description |
+|----------|-------|-------------|
+| **GBrain** | `memory/`, `*.md` | 38 pages, 81 chunks — full knowledge base |
+| **Components** | `mcp_bridge.py`, `lsp_client.py`, `bash_validator.py` | MCP Bridge, LSP Client, Bash Validator |
+| **Session Memory** | `SESSION_TRACKER.md`, `PROGRESS.md`, `ACTIVE_TASK.md` | Task tracking and history |
+| **Identity** | `SOUL.md`, `IDENTITY.md`, `AGENTS.md`, `USER.md` | Agent persona and user preferences |
+| **Paperclip** | `paperclip-fork/` | Local LLM adapters (Ollama, Kimi) |
+| **Scripts** | `search_flights.py`, `panchangam.py`, `benchmark_*.py` | Various utilities |
 
-Automated provisioning script for setting up a fresh Ubuntu Server (22.04/24.04) on a Dell Mini PC with OpenClaw and all required dependencies.
+## 🧠 GBrain Stats
 
-### What It Does
-
-1. **System Updates** - Updates packages and installs core dependencies (curl, git, ufw, tmux, etc.)
-2. **Firewall Setup** - Configures UFW with secure defaults:
-   - Denies incoming traffic by default
-   - Allows SSH, Tailscale overlay, and local subnet (192.168.1.0/24)
-3. **Docker Installation** - Installs Docker & Docker Compose
-4. **Tailscale VPN** - Installs Tailscale for secure remote access
-5. **OpenClaw Directories** - Creates `~/.openclaw/{workspace,plugins,data}`
-6. **Local AI (Ollama)** - Installs Ollama for local inference
-7. **Smart Router Model** - Pulls `tinydolphin` model for the Smart Router plugin
-
-### Usage
-
-```bash
-# On a fresh Ubuntu Server install, run:
-curl -fsSL https://raw.githubusercontent.com/gutchapa/openclaw/main/infrastructure/deploy_dell.sh | bash
+```
+Pages:     38
+Chunks:    81
+Embedded:  81 (100% local Ollama)
+Links:     0
+Tags:      0
 ```
 
-Or manually:
+**Data Sources:**
+- 7 session memory files
+- 17 workspace docs
+- 90 SQLite task runs exported
+- Hardware fixes (Intel AX200 WiFi)
+- Custom pages (people/ramesh, zero-token-mission)
+
+## 🔧 Key Components
+
+### MCP Bridge (`mcp_bridge.py`)
+- JSON-RPC bridge for Model Context Protocol
+- Tested with filesystem MCP server
+- 14 tools discovered successfully
+
+### LSP Client (`lsp_client.py`)
+- Auto-detects TypeScript/Python LSP servers
+- Connected to Python LSP successfully
+- Used for Paperclip code analysis
+
+### Bash Validator (`bash_validator.py`)
+- Blocks destructive commands (rm, dd)
+- Tested working
+
+## 🎯 Active Tasks
+
+- **Project Hail Mary** — BookMyShow booking (blocked by Cloudflare)
+- **Mac Mini M4 Migration** — Pending delivery
+- **WhatsApp Business API** — School setup in progress
+
+## 🚀 Migration to Mac Mini
+
 ```bash
-git clone https://github.com/gutchapa/openclaw.git
-cd openclaw
-./infrastructure/deploy_dell.sh
+# Copy these to Mac Mini:
+~/.gbrain/              # Vector database
+~/gbrain-repo/          # GBrain source
+~/.openclaw/workspace/  # This repo
+
+# On Mac Mini:
+cd ~/gbrain-repo
+bun install
+bun run src/cli.ts stats  # Verify
 ```
 
-## 📋 Commits Reference
+## 💾 Repo Stats
 
-| Commit | Description | File(s) |
-|--------|-------------|---------|
-| `a62cef0aee` | **Infrastructure as Code** - Dell Mini PC provisioning script | `infrastructure/deploy_dell.sh` |
-| `bbd29e5e84` | Infrastructure scripts and utility JS files | Various |
-| `8898964330` | Utility scripts, documentation, and browser-auth-fix-plugin | Various |
-| `9f3f64e59c` | Dependencies update and custom-router-plugin | Various |
-| `5b9d123f86` | Smart Router plugin with Ollama integration | Various |
-
-### To Pull a Specific Commit
-
-```bash
-# Pull the specific commit with deploy_dell.sh
-git fetch origin a62cef0aee
-git checkout a62cef0aee -- infrastructure/deploy_dell.sh
-
-# Or pull the full branch with all changes
-git pull origin main
-```
+- **Files:** 5419 (after removing node_modules)
+- **Commits:** 3
+- **Size:** ~50MB
+- **Last Updated:** 2026-04-12
 
 ## 🔗 Links
 
-- **Deploy Script:** https://github.com/gutchapa/openclaw/blob/main/infrastructure/deploy_dell.sh
-- **Repository:** https://github.com/gutchapa/openclaw
+- **GBrain Query:** `bun run src/cli.ts query "your question"`
+- **GitHub:** https://github.com/gutchapa/dell-claw-mini
