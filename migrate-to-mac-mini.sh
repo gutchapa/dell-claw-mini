@@ -141,6 +141,15 @@ else
     log "🤖 Ollama already installed"
 fi
 
+# Install MLX (Apple's native ML framework - FASTEST on M4)
+log "⚡ Installing MLX (Apple's native ML framework)..."
+if ! python3 -c "import mlx_lm" 2>/dev/null; then
+    log "  → Installing mlx-lm..."
+    pip3 install mlx-lm
+else
+    log "  ✅ MLX already installed"
+fi
+
 # Start Ollama
 log "🚀 Starting Ollama service..."
 ollama serve &
