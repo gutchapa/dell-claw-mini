@@ -1,0 +1,33 @@
+const manifest = {
+  id: "paperclipai.plugin-authoring-smoke-example",
+  apiVersion: 1,
+  version: "0.1.0",
+  displayName: "Plugin Authoring Smoke Example",
+  description: "A Paperclip plugin",
+  author: "Plugin Author",
+  categories: ["connector"],
+  capabilities: [
+    "events.subscribe",
+    "plugin.state.read",
+    "plugin.state.write"
+  ],
+  entrypoints: {
+    worker: "./dist/worker.js",
+    ui: "./dist/ui"
+  },
+  ui: {
+    slots: [
+      {
+        type: "dashboardWidget",
+        id: "health-widget",
+        displayName: "Plugin Authoring Smoke Example Health",
+        exportName: "DashboardWidget"
+      }
+    ]
+  }
+};
+var manifest_default = manifest;
+export {
+  manifest_default as default
+};
+//# sourceMappingURL=manifest.js.map
