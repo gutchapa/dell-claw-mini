@@ -3,3 +3,4 @@
 {"timestamp":"2026-04-13T16:15:08Z","task_id":"task_research_003","agent":"researcher","model":"tinydolphin","tokens_in":4567,"tokens_out":3456,"tokens_total":8023,"tokens_per_sec":6522,"prompt_eval_ms":1230,"cost_usd":0.0005}
 {"timestamp":"2026-04-13T16:15:08Z","task_id":"task_plan_004","agent":"planner","model":"mannix/qwen2.5-coder:7b","tokens_in":12345,"tokens_out":5678,"tokens_total":18023,"tokens_per_sec":9535,"prompt_eval_ms":1890,"cost_usd":0.0015}
 {"timestamp":"2026-04-13T16:46:03Z","task_id":"test_local_001","agent":"coder","model":"mannix/qwen2.5-coder:0.5b","tokens_in":38,"tokens_out":15,"tokens_total":53,"tokens_per_sec":3,"prompt_eval_ms":17638,"cost_usd":0.0}
+{"timestamp":"2026-04-13T17:40:12Z","task_id":"phi3_test_001","agent":"coder","model":"phi3:mini","tokens_in":41,"tokens_out":135,"tokens_total":176,"tokens_per_sec":2,"prompt_eval_ms":68293,"cost_usd":0.0}
