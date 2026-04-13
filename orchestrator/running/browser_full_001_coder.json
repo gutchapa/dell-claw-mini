@@ -1,0 +1,1 @@
+{"id": "browser_full_001", "desc": "Create a simple web browser in Python with tkinter - URL bar and webpage loading", "agent": "coder", "status": "error", "started_at": "2026-04-13T19:29:00Z", "error": "Command '['ollama', 'run', 'phi3:mini']' timed out after 90 seconds"}

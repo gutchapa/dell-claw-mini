@@ -1,0 +1,1 @@
+{"id": "simple_demo_001", "desc": "Write a function to add two numbers", "agent": "coder", "status": "done", "started_at": "2026-04-13T19:30:50Z", "completed_at": "2026-04-13T19:31:04Z", "result": "Generated /home/dell/.openclaw/workspace/agent-output/simple_demo_001/generated.py", "output_file": "/home/dell/.openclaw/workspace/agent-output/simple_demo_001/generated.py"}

@@ -4,3 +4,6 @@
 {"timestamp":"2026-04-13T16:15:08Z","task_id":"task_plan_004","agent":"planner","model":"mannix/qwen2.5-coder:7b","tokens_in":12345,"tokens_out":5678,"tokens_total":18023,"tokens_per_sec":9535,"prompt_eval_ms":1890,"cost_usd":0.0015}
 {"timestamp":"2026-04-13T16:46:03Z","task_id":"test_local_001","agent":"coder","model":"mannix/qwen2.5-coder:0.5b","tokens_in":38,"tokens_out":15,"tokens_total":53,"tokens_per_sec":3,"prompt_eval_ms":17638,"cost_usd":0.0}
 {"timestamp":"2026-04-13T17:40:12Z","task_id":"phi3_test_001","agent":"coder","model":"phi3:mini","tokens_in":41,"tokens_out":135,"tokens_total":176,"tokens_per_sec":2,"prompt_eval_ms":68293,"cost_usd":0.0}
+{"timestamp":"2026-04-13T18:36:19Z","task_id":"browser_task_001","agent":"coder","model":"phi3:mini","tokens_in":53,"tokens_out":254,"tokens_total":307,"tokens_per_sec":4,"prompt_eval_ms":76443,"cost_usd":0.0}
+{"timestamp":"2026-04-13T19:16:45Z","task_id":"test_fix_001","agent":"coder","model":"phi3:mini","tokens_in":37,"tokens_out":81,"tokens_total":118,"tokens_per_sec":5,"prompt_eval_ms":22744,"cost_usd":0.0}
+{"timestamp":"2026-04-13T19:31:04Z","task_id":"simple_demo_001","agent":"coder","model":"phi3:mini","tokens_in":39,"tokens_out":59,"tokens_total":98,"tokens_per_sec":6,"prompt_eval_ms":14408,"cost_usd":0.0}

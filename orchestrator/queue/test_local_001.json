@@ -1,1 +1,0 @@
-{"id": "test_local_001", "desc": "Write a hello world function", "agent": "coder", "status": "done", "started_at": "2026-04-13T16:45:46Z", "completed_at": "2026-04-13T16:46:03Z", "result": "Generated /home/dell/.openclaw/workspace/agent-output/test_local_001/generated.py", "output_file": "/home/dell/.openclaw/workspace/agent-output/test_local_001/generated.py"}

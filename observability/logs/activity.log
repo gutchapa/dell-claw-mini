@@ -8,3 +8,6 @@
 [02:04:06] planner: error - restructure-plan
 [02:04:06] executor: active - running-tests
 [02:04:06] reviewer: idle - standby
+[19:31:48] coder: idle - completed-simple_demo_001
+[19:31:48] reviewer: idle - completed-review
+[2026-04-13 19:31:48] Task simple_demo_001 completed with full workflow
