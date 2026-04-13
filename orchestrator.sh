@@ -22,7 +22,7 @@ assign_and_run() {
     local agent=$(/tmp/jq -r '.agent // "auto"' "$task_file")
     
     # Auto-detect agent if not specified
-    if [ "$agent" = "auto" ]; then
+    if [ "$agent" = "auto" ] || [ -z "$agent" ]; then
         if echo "$desc" | grep -qiE "code|script|write|fix|debug"; then agent="coder"
         elif echo "$desc" | grep -qiE "research|find|search|look"; then agent="researcher"
         elif echo "$desc" | grep -qiE "plan|design|architect"; then agent="planner"
@@ -34,7 +34,7 @@ assign_and_run() {
     mv "$task_file" "$ORCH_DIR/running/${id}_${agent}.json"
     
     # DISPATCH TO AGENT
-    "$WORKSPACE/subagents/$agent/run.sh" "$ORCH_DIR/running/${id}_${agent}.json" &
+    python3 "$WORKSPACE/subagents/$agent/run-phi3.py" "$ORCH_DIR/running/${id}_${agent}.json" &
 }
 
 check_results() {
