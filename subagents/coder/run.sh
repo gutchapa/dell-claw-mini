@@ -3,8 +3,8 @@
 # Usage: run.sh <task-file>
 
 TASK_FILE="$1"
-TASK_DESC=$(jq -r '.desc' "$TASK_FILE")
-TASK_ID=$(jq -r '.id' "$TASK_FILE")
+TASK_DESC=$(/tmp/jq -r '.desc' "$TASK_FILE")
+TASK_ID=$(/tmp/jq -r '.id' "$TASK_FILE")
 OUTPUT_DIR="$HOME/.openclaw/workspace/agent-output/$TASK_ID"
 
 mkdir -p "$OUTPUT_DIR"

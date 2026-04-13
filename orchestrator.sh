@@ -17,9 +17,9 @@ EOF
 
 assign_and_run() {
     local task_file="$1"
-    local id=$(jq -r '.id' "$task_file")
-    local desc=$(jq -r '.desc' "$task_file")
-    local agent=$(jq -r '.agent // "auto"' "$task_file")
+    local id=$(/tmp/jq -r '.id' "$task_file")
+    local desc=$(/tmp/jq -r '.desc' "$task_file")
+    local agent=$(/tmp/jq -r '.agent // "auto"' "$task_file")
     
     # Auto-detect agent if not specified
     if [ "$agent" = "auto" ]; then
@@ -40,8 +40,8 @@ assign_and_run() {
 check_results() {
     for f in "$ORCH_DIR/running"/*.json; do
         [ -f "$f" ] || continue
-        local status=$(jq -r '.status // "running"' "$f")
-        local id=$(jq -r '.id' "$f")
+        local status=$(/tmp/jq -r '.status // "running"' "$f")
+        local id=$(/tmp/jq -r '.id' "$f")
         if [ "$status" = "done" ] || [ "$status" = "error" ]; then
             mv "$f" "$ORCH_DIR/completed/"
             echo "✅ Completed: $id"
