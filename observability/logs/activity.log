@@ -1,0 +1,10 @@
+[19:57:39] coder: active - refactoring-mcp
+[19:57:45] researcher: idle - waiting-for-task
+[19:57:45] planner: error - workflow-design
+[2026-04-12 19:57:45] System initialized
+[2026-04-12 19:57:45] Coder agent started task
+[02:04:06] coder: active - building-dashboard
+[02:04:06] researcher: idle - waiting
+[02:04:06] planner: error - restructure-plan
+[02:04:06] executor: active - running-tests
+[02:04:06] reviewer: idle - standby

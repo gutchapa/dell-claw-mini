@@ -1,0 +1,8 @@
+{
+  "agent": "planner",
+  "status": "error",
+  "current_task": "restructure-plan",
+  "details": "YAML parsing failed",
+  "since": "2026-04-13T02:04:06Z",
+  "updated_at": "2026-04-13T02:04:06Z"
+}
