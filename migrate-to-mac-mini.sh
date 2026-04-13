@@ -126,6 +126,14 @@ if ! command -v bun &> /dev/null; then
     echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.zshrc
 fi
 
+# Install jq (for JSON parsing in dashboards)
+if ! command -v jq &> /dev/null; then
+    log "📦 Installing jq..."
+    curl -L https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-arm64 -o "$HOME/.local/bin/jq" 2>/dev/null || curl -L https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-amd64 -o "$HOME/.local/bin/jq"
+    chmod +x "$HOME/.local/bin/jq"
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Install pnpm if not present
 if ! command -v pnpm &> /dev/null; then
     log "📦 Installing pnpm..."

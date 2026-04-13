@@ -25,9 +25,9 @@ show_agent_status() {
     local status_file="$OBS_DIR/agents/$agent/status.json"
     
     if [ -f "$status_file" ]; then
-        local status=$(jq -r '.status // "unknown"' "$status_file" 2>/dev/null || echo "unknown")
-        local task=$(jq -r '.current_task // "none"' "$status_file" 2>/dev/null || echo "none")
-        local since=$(jq -r '.since // ""' "$status_file" 2>/dev/null || echo "")
+        local status=$(/tmp/jq -r '.status // "unknown"' "$status_file" 2>/dev/null || echo "unknown")
+        local task=$(/tmp/jq -r '.current_task // "none"' "$status_file" 2>/dev/null || echo "none")
+        local since=$(/tmp/jq -r '.since // ""' "$status_file" 2>/dev/null || echo "")
         
         case $status in
             "active") color=$GREEN; icon="🟢" ;;
@@ -54,9 +54,9 @@ show_metrics() {
     
     local metrics_file="$OBS_DIR/metrics/daily.json"
     if [ -f "$metrics_file" ]; then
-        local total_tasks=$(jq -r '.tasks_total // 0' "$metrics_file" 2>/dev/null)
-        local success_rate=$(jq -r '.success_rate // "N/A"' "$metrics_file" 2>/dev/null)
-        local avg_latency=$(jq -r '.avg_latency_ms // "N/A"' "$metrics_file" 2>/dev/null)
+        local total_tasks=$(/tmp/jq -r '.tasks_total // 0' "$metrics_file" 2>/dev/null)
+        local success_rate=$(/tmp/jq -r '.success_rate // "N/A"' "$metrics_file" 2>/dev/null)
+        local avg_latency=$(/tmp/jq -r '.avg_latency_ms // "N/A"' "$metrics_file" 2>/dev/null)
         
         echo "Tasks Today:    $total_tasks"
         echo "Success Rate:   $success_rate"
