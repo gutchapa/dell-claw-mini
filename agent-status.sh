@@ -49,8 +49,8 @@ show_agent_status() {
 }
 
 show_metrics() {
-    echo "📊 METRICS"
-    echo "----------"
+    echo "📊 SYSTEM METRICS"
+    echo "-----------------"
     
     local metrics_file="$OBS_DIR/metrics/daily.json"
     if [ -f "$metrics_file" ]; then
@@ -64,6 +64,33 @@ show_metrics() {
     else
         echo "No metrics available yet"
     fi
+    
+    # LLM Metrics
+    local llm_metrics="$OBS_DIR/metrics/llm-metrics.jsonl"
+    if [ -f "$llm_metrics" ]; then
+        echo ""
+        echo "🤖 LLM PERFORMANCE"
+        echo "------------------"
+        local total_tokens=$(awk '/"tokens_total"/{match($0, /"tokens_total":([0-9]+)/, arr); sum+=arr[1]} END {print sum}' "$llm_metrics" 2>/dev/null)
+        local avg_tps=$(awk '/"tokens_per_sec"/{match($0, /"tokens_per_sec":([0-9]+)/, arr); sum+=arr[1]; count++} END {if(count>0) print int(sum/count)}' "$llm_metrics" 2>/dev/null)
+        local total_cost=$(awk '/"cost_usd"/{match($0, /"cost_usd":([0-9.]+)/, arr); sum+=arr[1]} END {printf "%.4f", sum}' "$llm_metrics" 2>/dev/null)
+        
+        echo "Total Tokens:   ${total_tokens:-0}"
+        echo "Avg Speed:      ${avg_tps:-0} tokens/sec"
+        echo "Total Cost:     \$${total_cost:-0.0000}"
+        
+        # Recent LLM tasks
+        echo ""
+        echo "Recent LLM Tasks:"
+        tail -3 "$llm_metrics" | while read line; do
+            local task=$(echo "$line" | grep -o '"task_id":"[^"]*"' | cut -d'"' -f4)
+            local model=$(echo "$line" | grep -o '"model":"[^"]*"' | cut -d'"' -f4)
+            local tps=$(echo "$line" | grep -o '"tokens_per_sec":[0-9]*' | cut -d: -f2)
+            local cost=$(echo "$line" | grep -o '"cost_usd":[0-9.]*' | cut -d: -f2)
+            printf "  %-18s | %-12s | %5d t/s | \$%s\n" "$task" "$model" "$tps" "$cost"
+        done
+    fi
+    
     echo ""
 }
 
