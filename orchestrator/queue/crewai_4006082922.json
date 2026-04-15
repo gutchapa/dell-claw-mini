@@ -1,0 +1,1 @@
+{"id": "crewai_4006082922", "desc": "Generate tsconfig.json for Bun/TypeScript. Output ONLY the code/content.", "agent": "coder", "status": "error", "started_at": "2026-04-13T21:07:37Z", "error": "Command '['ollama', 'run', 'phi3:mini']' timed out after 90 seconds"}

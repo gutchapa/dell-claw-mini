@@ -1,0 +1,1 @@
+{"id": "crewai_3651559316", "desc": "Write RAGDatabase class with PGlite vector support. Output ONLY the code/content.", "agent": "coder", "status": "error", "started_at": "2026-04-13T21:09:07Z", "error": "Command '['ollama', 'run', 'phi3:mini']' timed out after 90 seconds"}

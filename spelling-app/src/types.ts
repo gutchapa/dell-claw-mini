@@ -6,6 +6,11 @@ export interface Word {
   difficulty: Difficulty;
 }
 
+export interface WrongWord {
+  word: Word;
+  userAnswer: string;
+}
+
 export interface GameState {
   currentWordIndex: number;
   score: number;
@@ -23,3 +28,9 @@ export interface UserStats {
     avgScore: number;
   }>;
 }
+
+export type RootStackParamList = {
+  Home: undefined;
+  Game: { difficulty: Difficulty; practiceWords?: Word[] };
+  Results: { score: number; totalWords: number; wrongWords: WrongWord[]; difficulty: Difficulty };
+};

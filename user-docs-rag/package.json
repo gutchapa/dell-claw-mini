@@ -1,0 +1,22 @@
+{
+  "name": "user-docs-rag",
+  "version": "1.0.0",
+  "description": "TypeScript RAG with PGlite and Ollama embeddings",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "bun build src/index.ts --outdir dist",
+    "ingest": "bun run src/index.ts ingest",
+    "search": "bun run src/index.ts search",
+    "dev": "bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.2.0",
+    "ollama": "^0.5.0",
+    "glob": "^10.3.0",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0"
+  }
+}
