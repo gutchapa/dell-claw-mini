@@ -40,19 +40,24 @@ check_action() {
         violations+=("DELEGATE TO AGENTS")
     fi
     
+    # Check 4: Intervening in CrewAI review process
+    if echo "$action_lower" | grep -qE "(intervene|override|manual).*(review|process|agent)"; then
+        violations+=("DO NOT INTERVENE IN CREWAI REVIEW")
+    fi
+    
     if [ ${#violations[@]} -eq 0 ]; then
         echo "✅ PASS - No SOUL.md violations"
         return 0
     else
-        echo "🚨 VIOLATION DETECTED"
+        echo "🚨 SOUL-EL VIOLATION DETECTED"
         echo ""
         echo "Violated principles:"
         for v in "${violations[@]}"; do echo "  • $v"; done
         echo ""
-        echo "Options:"
-        echo "  [1] OVERRIDE - Execute anyway (you decide)"
-        echo "  [2] CORRECT - Fix to comply with SOUL.md"
-        echo "  [3] UPDATE SOUL - Modify principle"
+        echo "⚠️ MANDATORY: Call 'ask_user' tool now to request an override."
+        echo "Question: \"SOUL-EL Violation: ${violations[*]}. Action: $action. Override?\""
+        echo "Options: [1] OVERRIDE, [2] CORRECT, [3] UPDATE SOUL"
+        echo ""
         return 1
     fi
 }

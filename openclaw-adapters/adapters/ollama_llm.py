@@ -18,7 +18,7 @@ class OllamaLLM:
             json.dump({'id': task_id, 'desc': prompt[:200], 'agent': 'coder', 'status': 'queued'}, f)
         
         # Run agent
-        agent_script = f"{self.workspace}/subagents/coder/run-phi3.py" if 'phi3' in self.model else f"{self.workspace}/subagents/coder/run-ollama.py"
+        agent_script = f"{self.workspace}/subagents/coder/run-kimi.py"
         result = subprocess.run(['python3', agent_script, task_file], capture_output=True, text=True, timeout=120)
         
         # Read output
