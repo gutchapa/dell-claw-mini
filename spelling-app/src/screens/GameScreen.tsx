@@ -1,37 +1,27 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { StyleSheet, View, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Layout, Text, Card, Input, Button, ProgressBar, Icon } from '@ui-kitten/components';
+import { Layout, Text } from '@ui-kitten/components';
 import * as Speech from 'expo-speech';
 import { RootStackParamList, Word, WrongWord } from '../types';
 import { getRandomWords } from '../data/words';
-import { Feedback } from '../components/Feedback';
+import { updateProfileStats } from '../utils/storage';
 
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
 
-const GAME_DURATION = 30 * 60;
-
-const SpeakerIcon = (props: any) => (
-  <Icon {...props} name='volume-up-outline' />
-);
-
-const HintIcon = (props: any) => (
-  <Icon {...props} name='bulb-outline' />
-);
-
 export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => {
-  const { difficulty, practiceWords } = route.params;
+  const { difficulty, practiceWords, profileId } = route.params;
   
   const [words, setWords] = useState<Word[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [showHint, setShowHint] = useState(false);
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  
+  const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (practiceWords && practiceWords.length > 0) {
@@ -41,167 +31,156 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
     }
   }, [difficulty, practiceWords]);
 
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            endGame();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft]);
-
-  const formatTime = useCallback((seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }, []);
-
   const speakWord = useCallback(() => {
     if (words[currentIndex]) {
       Speech.stop();
-      Speech.speak(words[currentIndex].word, { rate: 0.7 });
+      Speech.speak(words[currentIndex].word, { rate: 0.8 });
     }
   }, [words, currentIndex]);
 
-  const endGame = useCallback(() => {
-    navigation.navigate('Results', {
-      score,
-      totalWords: words.length,
-      wrongWords,
-      difficulty,
-    });
-  }, [score, words.length, wrongWords, difficulty, navigation]);
-
-  const checkAnswer = useCallback(() => {
-    if (!words[currentIndex]) return;
+  const checkAnswer = () => {
+    if (!words[currentIndex] || showFeedback) return;
 
     const trimmedInput = userInput.trim().toLowerCase();
     const correctWord = words[currentIndex].word.toLowerCase();
-    const isCorrect = trimmedInput === correctWord;
+    const correct = trimmedInput === correctWord;
 
-    setLastAnswerCorrect(isCorrect);
+    setIsCorrect(correct);
     setShowFeedback(true);
 
-    if (isCorrect) {
-      setScore(s => s + 10 + streak);
-      setStreak(s => s + 1);
+    if (correct) {
+      setScore(s => s + 10);
     } else {
-      setStreak(0);
       setWrongWords(prev => [
         ...prev,
         { word: words[currentIndex], userAnswer: userInput.trim() },
       ]);
     }
+  };
 
-    setTimeout(() => {
-      if (currentIndex >= words.length - 1) {
-        endGame();
-      } else {
-        setCurrentIndex(i => i + 1);
-        setUserInput('');
-        setShowHint(false);
-        setShowFeedback(false);
-      }
-    }, 2000);
-  }, [words, currentIndex, userInput, streak, endGame]);
+  const nextWord = async () => {
+    if (currentIndex >= words.length - 1) {
+      // Save stats to profile
+      await updateProfileStats(profileId, score, difficulty);
+      
+      navigation.navigate('Results', {
+        score,
+        totalWords: words.length,
+        wrongWords,
+        difficulty,
+        profileId
+      });
+    } else {
+      setCurrentIndex(i => i + 1);
+      setUserInput('');
+      setShowFeedback(false);
+      setShowHint(false);
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  };
 
   const currentWord = words[currentIndex];
-  const progress = words.length > 0 ? (currentIndex + 1) / words.length : 0;
+  const progress = words.length > 0 ? ((currentIndex) / words.length) * 100 : 0;
 
   return (
     <Layout style={styles.container}>
-      {/* Header Stats */}
-      <Layout style={styles.header}>
-        <Layout style={styles.statRow}>
-          <Text category='s1'>⏱️ {formatTime(timeLeft)}</Text>
-          <Text category='s1'>Score: {score}</Text>
-          <Text category='s1'>🔥 {streak}</Text>
-        </Layout>
-        <ProgressBar
-          progress={progress}
-          style={styles.progressBar}
-          status='primary'
-        />
-        <Text category='c1' style={styles.progressText}>
-          Word {currentIndex + 1} of {words.length}
-        </Text>
-      </Layout>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ flex: 1 }}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
+            <Text style={styles.closeText}>✕</Text>
+          </TouchableOpacity>
+          <View style={styles.progressBackground}>
+            <View style={[styles.progressFill, { width: `${progress}%` }]} />
+          </View>
+        </View>
 
-      {currentWord && (
-        <Card style={styles.gameCard}>
-          {/* Speak Button */}
-          <Button
-            style={styles.speakButton}
-            accessoryLeft={SpeakerIcon}
-            onPress={speakWord}
-            status='primary'
-          >
-            Listen to Word
-          </Button>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.instruction}>Write this in English</Text>
+          
+          <View style={styles.audioRow}>
+            <View style={styles.audioButtons}>
+              <TouchableOpacity onPress={speakWord} style={styles.speakerButton}>
+                <Text style={styles.speakerEmoji}>🔊</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                onPress={() => setShowHint(true)} 
+                style={[styles.speakerButton, styles.hintToggleButton]}
+                disabled={showFeedback}
+              >
+                <Text style={styles.speakerEmoji}>💡</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.hintBubble}>
+              <Text style={styles.hintText}>{currentWord?.maskedHint}</Text>
+              {showHint && (
+                <View style={styles.textHintContainer}>
+                  <Text style={styles.textHint}>{currentWord?.hint}</Text>
+                </View>
+              )}
+            </View>
+          </View>
 
-          {/* Masked Hint */}
-          <Layout style={styles.maskedHintContainer}>
-            <Text category='label' appearance='hint'>Hint:</Text>
-            <Text category='h1' status='info' style={styles.maskedHint}>
-              {currentWord.maskedHint}
-            </Text>
-          </Layout>
-
-          {showHint && (
-            <Text category='p2' style={styles.hintText}>
-              💡 {currentWord.hint}
-            </Text>
-          )}
-
-          {/* Input */}
-          <Input
-            style={styles.input}
-            placeholder='Type the word...'
-            value={userInput}
-            onChangeText={setUserInput}
-            disabled={showFeedback}
-            autoCapitalize='none'
-            autoCorrect={false}
-          />
-
-          {/* Feedback */}
-          {showFeedback && (
-            <Feedback
-              isCorrect={lastAnswerCorrect}
-              userAnswer={userInput}
-              correctAnswer={currentWord.word}
+          <View style={styles.inputContainer}>
+            <TextInput
+              ref={inputRef}
+              style={styles.input}
+              placeholder="Type your answer"
+              value={userInput}
+              onChangeText={setUserInput}
+              autoFocus={true}
+              autoCapitalize="none"
+              autoCorrect={false}
+              editable={!showFeedback}
+              onSubmitEditing={checkAnswer}
             />
-          )}
+          </View>
+        </ScrollView>
 
-          {/* Action Buttons */}
-          <Layout style={styles.buttonRow}>
-            <Button
-              style={styles.hintButton}
-              accessoryLeft={HintIcon}
-              appearance='outline'
-              status='warning'
-              onPress={() => setShowHint(true)}
-              disabled={showFeedback}
-            >
-              Hint
-            </Button>
-            <Button
-              style={styles.submitButton}
-              status='success'
+        {/* Footer / Feedback */}
+        <View style={[
+          styles.footer,
+          showFeedback && (isCorrect ? styles.footerCorrect : styles.footerIncorrect)
+        ]}>
+          {showFeedback ? (
+            <View style={styles.feedbackContent}>
+              <View style={styles.feedbackTextRow}>
+                <View style={[styles.feedbackIcon, { backgroundColor: isCorrect ? '#58CC02' : '#FF4B4B' }]}>
+                  <Text style={styles.feedbackIconText}>{isCorrect ? '✓' : '✕'}</Text>
+                </View>
+                <View>
+                  <Text style={[styles.feedbackTitle, { color: isCorrect ? '#58CC02' : '#FF4B4B' }]}>
+                    {isCorrect ? 'Amazing!' : 'Correct solution:'}
+                  </Text>
+                  {!isCorrect && (
+                    <Text style={styles.correctSolution}>{currentWord?.word}</Text>
+                  )}
+                </View>
+              </View>
+              <TouchableOpacity
+                onPress={nextWord}
+                style={[styles.actionButton, { backgroundColor: isCorrect ? '#58CC02' : '#FF4B4B', borderBottomColor: isCorrect ? '#46A302' : '#EA2B2B' }]}
+              >
+                <Text style={styles.actionButtonText}>CONTINUE</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
               onPress={checkAnswer}
-              disabled={showFeedback || !userInput.trim()}
+              disabled={!userInput.trim()}
+              style={[
+                styles.actionButton,
+                !userInput.trim() ? styles.buttonDisabled : { backgroundColor: '#58CC02', borderBottomColor: '#46A302' }
+              ]}
             >
-              Submit
-            </Button>
-          </Layout>
-        </Card>
-      )}
+              <Text style={styles.actionButtonText}>CHECK</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </KeyboardAvoidingView>
     </Layout>
   );
 };
@@ -209,66 +188,172 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f7f9fc',
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    marginBottom: 16,
-  },
-  statRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  progressBar: {
-    height: 8,
-    borderRadius: 4,
-  },
-  progressText: {
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  gameCard: {
-    borderRadius: 12,
-    padding: 16,
-  },
-  speakButton: {
-    marginBottom: 16,
-    borderRadius: 8,
-  },
-  maskedHintContainer: {
     alignItems: 'center',
-    marginBottom: 16,
-    padding: 16,
-    backgroundColor: '#E3F2FD',
+    paddingHorizontal: 20,
+    paddingTop: 50,
+    paddingBottom: 20,
+  },
+  closeButton: {
+    marginRight: 15,
+  },
+  closeText: {
+    fontSize: 24,
+    color: '#AFAFAF',
+    fontWeight: 'bold',
+  },
+  progressBackground: {
+    flex: 1,
+    height: 16,
+    backgroundColor: '#E5E5E5',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#58CC02',
     borderRadius: 8,
   },
-  maskedHint: {
-    letterSpacing: 8,
-    marginTop: 8,
+  content: {
+    padding: 24,
+  },
+  instruction: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#4B4B4B',
+    marginBottom: 40,
+  },
+  audioRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 30,
+  },
+  audioButtons: {
+    gap: 10,
+  },
+  speakerButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#1CB0F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: 4,
+    borderBottomColor: '#1899D6',
+  },
+  hintToggleButton: {
+    backgroundColor: '#FFC800',
+    borderBottomColor: '#E5B400',
+  },
+  speakerEmoji: {
+    fontSize: 30,
+  },
+  hintBubble: {
+    marginLeft: 20,
+    padding: 15,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    flex: 1,
+    minHeight: 130,
+    justifyContent: 'center',
   },
   hintText: {
+    fontSize: 22,
+    letterSpacing: 4,
+    color: '#4B4B4B',
+    fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 16,
+  },
+  textHintContainer: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E5E5',
+  },
+  textHint: {
+    fontSize: 16,
+    color: '#777777',
     fontStyle: 'italic',
-    backgroundColor: '#FFF9C4',
-    padding: 12,
-    borderRadius: 8,
+    textAlign: 'center',
+  },
+  inputContainer: {
+    width: '100%',
+    minHeight: 150,
+    backgroundColor: '#F7F7F7',
+    borderRadius: 15,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    padding: 15,
   },
   input: {
-    marginBottom: 16,
+    fontSize: 20,
+    color: '#4B4B4B',
+    fontWeight: '600',
   },
-  buttonRow: {
+  footer: {
+    padding: 20,
+    paddingBottom: 40,
+    borderTopWidth: 2,
+    borderTopColor: '#E5E5E5',
+  },
+  footerCorrect: {
+    backgroundColor: '#E5FFD1',
+    borderTopColor: '#A5ED6E',
+  },
+  footerIncorrect: {
+    backgroundColor: '#FFDFE0',
+    borderTopColor: '#FF4B4B',
+  },
+  feedbackContent: {
+    gap: 20,
+  },
+  feedbackTextRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 8,
+    alignItems: 'center',
   },
-  hintButton: {
-    flex: 1,
+  feedbackIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
   },
-  submitButton: {
-    flex: 2,
+  feedbackIconText: {
+    color: '#FFFFFF',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  feedbackTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+  },
+  correctSolution: {
+    fontSize: 18,
+    color: '#FF4B4B',
+    fontWeight: '700',
+  },
+  actionButton: {
+    height: 55,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderBottomWidth: 5,
+  },
+  actionButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  buttonDisabled: {
+    backgroundColor: '#E5E5E5',
+    borderBottomWidth: 0,
   },
 });
 

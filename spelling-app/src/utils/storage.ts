@@ -1,20 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserStats, Difficulty } from '../types';
+import { UserStats, Difficulty, UserProfile } from '../types';
 
-const STATS_KEY = '@spelling_master_stats';
+const PROFILES_KEY = '@spelling_master_profiles';
 
-export const loadStats = async (): Promise<UserStats | null> => {
+export const loadProfiles = async (): Promise<UserProfile[]> => {
   try {
-    const data = await AsyncStorage.getItem(STATS_KEY);
-    return data ? JSON.parse(data) : null;
+    const data = await AsyncStorage.getItem(PROFILES_KEY);
+    return data ? JSON.parse(data) : [];
   } catch {
-    return null;
+    return [];
   }
 };
 
-export const saveStats = async (stats: UserStats): Promise<void> => {
+export const saveProfiles = async (profiles: UserProfile[]): Promise<void> => {
   try {
-    await AsyncStorage.setItem(STATS_KEY, JSON.stringify(stats));
+    await AsyncStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
   } catch {
     // Handle error silently
   }
@@ -33,20 +33,28 @@ export const createInitialStats = (): UserStats => ({
   },
 });
 
-export const updateStats = (
-  currentStats: UserStats,
+export const updateProfileStats = async (
+  profileId: string,
   score: number,
   difficulty: Difficulty
-): UserStats => {
-  const newStats = { ...currentStats };
-  newStats.totalGames += 1;
-  newStats.totalScore += score;
-  newStats.lastPlayed = new Date().toISOString();
+): Promise<void> => {
+  const profiles = await loadProfiles();
+  const profileIndex = profiles.findIndex(p => p.id === profileId);
   
-  const diffStat = newStats.difficultyStats[difficulty];
+  if (profileIndex === -1) return;
+
+  const profile = profiles[profileIndex];
+  const stats = profile.stats;
+
+  stats.totalGames += 1;
+  stats.totalScore += score;
+  stats.lastPlayed = new Date().toISOString();
+  
+  const diffStat = stats.difficultyStats[difficulty];
   const newAvg = ((diffStat.avgScore * diffStat.gamesPlayed) + score) / (diffStat.gamesPlayed + 1);
   diffStat.gamesPlayed += 1;
   diffStat.avgScore = Math.round(newAvg);
-  
-  return newStats;
+
+  profiles[profileIndex] = { ...profile, stats };
+  await saveProfiles(profiles);
 };

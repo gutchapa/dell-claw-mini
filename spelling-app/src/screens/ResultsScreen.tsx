@@ -1,251 +1,160 @@
-import React, { useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
-import * as Speech from 'expo-speech';
+import React from 'react';
+import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList, WrongWord } from '../types';
+import { Layout, Text } from '@ui-kitten/components';
+import { RootStackParamList } from '../types';
 
 type ResultsScreenProps = NativeStackScreenProps<RootStackParamList, 'Results'>;
 
-export const ResultsScreen: React.FC<ResultsScreenProps> = ({
-  navigation,
-  route,
-}) => {
-  const { score, totalWords, wrongWords, difficulty } = route.params;
+export const ResultsScreen: React.FC<ResultsScreenProps> = ({ navigation, route }) => {
+  const { score, totalWords, wrongWords, difficulty, profileId } = route.params;
 
-  const percentage = Math.round((score / (totalWords * 10)) * 100);
-  const correctCount = totalWords - wrongWords.length;
-
-  const getPerformanceMessage = () => {
-    if (percentage >= 90) return '🏆 Excellent!';
-    if (percentage >= 70) return '🌟 Great job!';
-    if (percentage >= 50) return '👍 Good effort!';
-    return '💪 Keep practicing!';
-  };
-
-  const speakWord = useCallback((word: string) => {
-    Speech.stop();
-    Speech.speak(word, { rate: 0.7 });
-  }, []);
-
-  const handlePracticeWrongWords = () => {
-    if (wrongWords.length > 0) {
-      const wordsToPractice = wrongWords.map(ww => ww.word);
-      navigation.navigate('Game', { difficulty, practiceWords: wordsToPractice });
-    }
-  };
-
-  const handleGoHome = () => {
-    navigation.navigate('Home');
-  };
+  const percentage = Math.round(((totalWords - wrongWords.length) / totalWords) * 100);
 
   return (
-    <ScrollView style={styles.scrollContainer} contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🎉 Game Over!</Text>
-      <Text style={styles.performance}>{getPerformanceMessage()}</Text>
-
-      {/* Score Section */}
-      <View style={styles.scoreCard}>
-        <Text style={styles.scorePercentage}>{percentage}%</Text>
-        <Text style={styles.scoreDetails}>
-          {correctCount}/{totalWords} correct
-        </Text>
-        <Text style={styles.scorePoints}>Total Points: {score}</Text>
-      </View>
-
-      {/* Wrong Words Section */}
-      {wrongWords.length > 0 && (
-        <View style={styles.wrongWordsSection}>
-          <Text style={styles.sectionTitle}>Words to Review</Text>
-          
-          {wrongWords.map((item, index) => (
-            <View key={index} style={styles.wrongWordCard}>
-              <View style={styles.wordRow}>
-                <Text style={styles.correctWord}>{item.word.word}</Text>
-                <TouchableOpacity
-                  style={styles.hearButton}
-                  onPress={() => speakWord(item.word.word)}
-                >
-                  <Text style={styles.hearButtonText}>🔊</Text>
-                </TouchableOpacity>
-              </View>
-              
-              <Text style={styles.userAnswer}>
-                Your answer: {item.userAnswer || '(empty)'}
-              </Text>
-              
-              <View style={styles.hintContainer}>
-                <Text style={styles.hintLabel}>💡 Hint:</Text>
-                <Text style={styles.hintText}>{item.word.hint}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-      )}
-
-      {/* Action Buttons */}
-      <View style={styles.buttonContainer}>
-        {wrongWords.length > 0 && (
-          <TouchableOpacity
-            style={styles.practiceButton}
-            onPress={handlePracticeWrongWords}
-          >
-            <Text style={styles.practiceButtonText}>
-              🔄 Practice Wrong Words
-            </Text>
-          </TouchableOpacity>
-        )}
+    <Layout style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>Lesson Complete!</Text>
         
-        <TouchableOpacity style={styles.homeButton} onPress={handleGoHome}>
-          <Text style={styles.homeButtonText}>🏠 Back to Home</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <View style={styles.statsRow}>
+          <View style={[styles.statCard, { backgroundColor: '#FFC800', borderBottomColor: '#E5B400' }]}>
+            <Text style={styles.statEmoji}>✨</Text>
+            <Text style={styles.statValue}>{score}</Text>
+            <Text style={styles.statLabel}>TOTAL XP</Text>
+          </View>
+          <View style={[styles.statCard, { backgroundColor: '#58CC02', borderBottomColor: '#46A302' }]}>
+            <Text style={styles.statEmoji}>🎯</Text>
+            <Text style={styles.statValue}>{percentage}%</Text>
+            <Text style={styles.statLabel}>ACCURACY</Text>
+          </View>
+        </View>
+
+        {wrongWords.length > 0 && (
+          <View style={styles.reviewSection}>
+            <Text style={styles.reviewTitle}>Words to practice</Text>
+            {wrongWords.map((item, index) => (
+              <View key={index} style={styles.wrongWordRow}>
+                <Text style={styles.wrongWordText}>{item.word.word}</Text>
+                <Text style={styles.wrongWordUser}>{item.userAnswer || '(empty)'}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <View style={styles.buttonContainer}>
+          {wrongWords.length > 0 && (
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Game', { difficulty, profileId, practiceWords: wrongWords.map(w => w.word) })}
+              style={[styles.duoButton, { backgroundColor: '#1CB0F6', borderBottomColor: '#1899D6' }]}
+            >
+              <Text style={styles.duoButtonText}>PRACTICE MISTAKES</Text>
+            </TouchableOpacity>
+          )}
+          
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Home', { profileId })}
+            style={[styles.duoButton, { backgroundColor: '#58CC02', borderBottomColor: '#46A302' }]}
+          >
+            <Text style={styles.duoButtonText}>CONTINUE</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </Layout>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
   container: {
-    padding: 20,
-    paddingBottom: 40,
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  content: {
+    padding: 24,
+    alignItems: 'center',
+    paddingTop: 60,
   },
   title: {
-    fontSize: 36,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#58CC02',
+    marginBottom: 40,
     textAlign: 'center',
-    marginTop: 20,
-    marginBottom: 10,
-    color: '#333',
   },
-  performance: {
-    fontSize: 24,
-    textAlign: 'center',
-    color: '#6200ee',
-    marginBottom: 20,
+  statsRow: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 40,
   },
-  scoreCard: {
-    backgroundColor: '#fff',
+  statCard: {
+    flex: 1,
+    padding: 15,
     borderRadius: 15,
-    padding: 25,
+    borderBottomWidth: 5,
     alignItems: 'center',
-    marginBottom: 25,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
   },
-  scorePercentage: {
-    fontSize: 56,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+  statEmoji: {
+    fontSize: 24,
+    marginBottom: 5,
   },
-  scoreDetails: {
+  statValue: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  statLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    opacity: 0.9,
+  },
+  reviewSection: {
+    width: '100%',
+    backgroundColor: '#F7F7F7',
+    borderRadius: 15,
+    padding: 20,
+    borderWidth: 2,
+    borderColor: '#E5E5E5',
+    marginBottom: 30,
+  },
+  reviewTitle: {
     fontSize: 18,
-    color: '#666',
-    marginTop: 5,
-  },
-  scorePoints: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
-    marginTop: 10,
-  },
-  wrongWordsSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '900',
+    color: '#4B4B4B',
     marginBottom: 15,
   },
-  wrongWordCard: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 12,
-    borderLeftWidth: 4,
-    borderLeftColor: '#F44336',
-    elevation: 2,
-  },
-  wordRow: {
+  wrongWordRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E5E5',
   },
-  correctWord: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+  wrongWordText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#58CC02',
   },
-  userAnswer: {
-    fontSize: 14,
-    color: '#F44336',
-    marginBottom: 10,
-  },
-  hearButton: {
-    backgroundColor: '#e3f2fd',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  hearButtonText: {
-    fontSize: 20,
-  },
-  hintContainer: {
-    backgroundColor: '#fff9c4',
-    padding: 10,
-    borderRadius: 8,
-  },
-  hintLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 2,
-  },
-  hintText: {
-    fontSize: 14,
-    color: '#333',
-    fontStyle: 'italic',
+  wrongWordUser: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FF4B4B',
+    textDecorationLine: 'line-through',
   },
   buttonContainer: {
-    gap: 12,
-    marginTop: 10,
+    width: '100%',
+    gap: 15,
   },
-  practiceButton: {
-    backgroundColor: '#FF9800',
-    padding: 18,
-    borderRadius: 12,
+  duoButton: {
+    height: 55,
+    borderRadius: 15,
+    justifyContent: 'center',
     alignItems: 'center',
-    elevation: 3,
+    borderBottomWidth: 5,
   },
-  practiceButtonText: {
-    color: '#fff',
+  duoButtonText: {
+    color: '#FFFFFF',
     fontSize: 18,
-    fontWeight: 'bold',
-  },
-  homeButton: {
-    backgroundColor: '#6200ee',
-    padding: 18,
-    borderRadius: 12,
-    alignItems: 'center',
-    elevation: 3,
-  },
-  homeButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '900',
   },
 });
 

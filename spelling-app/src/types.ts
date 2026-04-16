@@ -3,20 +3,13 @@ export type Difficulty = 'simple' | 'medium' | 'hard' | 'veryHard';
 export interface Word {
   word: string;
   hint: string;
-  maskedHint: string;  // e.g., "F_X_" for "FIRE"
+  maskedHint: string;
   difficulty: Difficulty;
 }
 
 export interface WrongWord {
   word: Word;
   userAnswer: string;
-}
-
-export interface GameState {
-  currentWordIndex: number;
-  score: number;
-  timeRemaining: number;
-  streak: number;
 }
 
 export interface UserStats {
@@ -30,8 +23,16 @@ export interface UserStats {
   }>;
 }
 
+export interface UserProfile {
+  id: string;
+  name: string;
+  avatar: string; // Emoji for now
+  stats: UserStats;
+}
+
 export type RootStackParamList = {
-  Home: undefined;
-  Game: { difficulty: Difficulty; practiceWords?: Word[] };
-  Results: { score: number; totalWords: number; wrongWords: WrongWord[]; difficulty: Difficulty };
+  ProfileSelection: undefined;
+  Home: { profileId: string };
+  Game: { difficulty: Difficulty; profileId: string; practiceWords?: Word[] };
+  Results: { score: number; totalWords: number; wrongWords: WrongWord[]; difficulty: Difficulty; profileId: string };
 };
