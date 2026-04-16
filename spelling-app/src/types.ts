@@ -3,6 +3,7 @@ export type Difficulty = 'simple' | 'medium' | 'hard' | 'veryHard';
 export interface Word {
   word: string;
   hint: string;
+  maskedHint: string;  // e.g., "F_X_" for "FIRE"
   difficulty: Difficulty;
 }
 

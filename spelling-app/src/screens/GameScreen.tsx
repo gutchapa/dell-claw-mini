@@ -8,7 +8,7 @@ import { Feedback } from '../components/Feedback';
 
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
 
-const GAME_DURATION = 30 * 60; // 30 minutes in seconds
+const GAME_DURATION = 30 * 60;
 
 export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => {
   const { difficulty, practiceWords } = route.params;
@@ -24,7 +24,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
   const [showFeedback, setShowFeedback] = useState(false);
   const [lastAnswerCorrect, setLastAnswerCorrect] = useState(false);
 
-  // Initialize game
   useEffect(() => {
     if (practiceWords && practiceWords.length > 0) {
       setWords(practiceWords);
@@ -33,7 +32,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
     }
   }, [difficulty, practiceWords]);
 
-  // Timer
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setInterval(() => {
@@ -78,7 +76,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
     const correctWord = words[currentIndex].word.toLowerCase();
     const isCorrect = trimmedInput === correctWord;
 
-    // Show feedback
     setLastAnswerCorrect(isCorrect);
     setShowFeedback(true);
 
@@ -93,7 +90,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
       ]);
     }
 
-    // Wait for user to see feedback, then move to next word
     setTimeout(() => {
       if (currentIndex >= words.length - 1) {
         endGame();
@@ -110,7 +106,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
 
   return (
     <View style={styles.container}>
-      {/* Timer and Score */}
       <View style={styles.header}>
         <Text style={styles.timer}>⏱️ {formatTime(timeLeft)}</Text>
         <Text style={styles.score}>Score: {score} | Streak: {streak}</Text>
@@ -118,22 +113,24 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
 
       {currentWord && (
         <>
-          {/* Word Progress */}
           <Text style={styles.wordNumber}>
             Word {currentIndex + 1} of {words.length}
           </Text>
 
-          {/* Audio Pronunciation Button */}
           <TouchableOpacity style={styles.speakButton} onPress={speakWord}>
             <Text style={styles.speakButtonText}>🔊 Listen</Text>
           </TouchableOpacity>
 
-          {/* Hint */}
+          {/* Masked Hint Display */}
+          <View style={styles.maskedHintContainer}>
+            <Text style={styles.maskedHintLabel}>Hint:</Text>
+            <Text style={styles.maskedHintText}>{currentWord.maskedHint}</Text>
+          </View>
+
           {showHint && (
             <Text style={styles.hint}>💡 {currentWord.hint}</Text>
           )}
 
-          {/* Answer Input */}
           <TextInput
             style={styles.input}
             value={userInput}
@@ -145,7 +142,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
             editable={!showFeedback}
           />
 
-          {/* Feedback Component */}
           {showFeedback && (
             <Feedback
               isCorrect={lastAnswerCorrect}
@@ -154,7 +150,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
             />
           )}
 
-          {/* Action Buttons */}
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={[styles.hintButton, showFeedback && styles.disabledButton]}
@@ -217,6 +212,26 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
+  },
+  maskedHintContainer: {
+    backgroundColor: '#e3f2fd',
+    padding: 20,
+    borderRadius: 15,
+    marginBottom: 20,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#2196F3',
+  },
+  maskedHintLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 5,
+  },
+  maskedHintText: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: '#2196F3',
+    letterSpacing: 8,
   },
   hint: {
     textAlign: 'center',
