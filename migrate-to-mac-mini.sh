@@ -1,275 +1,96 @@
 #!/bin/bash
-# Dell-Claw → Mac Mini M4 Migration Script
-# One-shot setup for complete workspace migration
-# Usage: curl -fsSL https://raw.githubusercontent.com/gutchapa/dell-claw-mini/master/migrate-to-mac-mini.sh | bash
+# migrate-to-mac-mini.sh - Updated with llama.cpp Mac build
 
-set -euo pipefail
+# ============================================================================
+# MAC MINI M4 MIGRATION GUIDE
+# ============================================================================
+# This script guides migration from Dell WSL to Mac Mini M4
+# 
+# HARDWARE DIFFERENCES:
+# - Dell: x86_64, 16GB RAM, WSL2
+# - Mac Mini M4: ARM64 (Apple Silicon), 16GB unified RAM, macOS
+#
+# LLAMA.CPP REBUILD REQUIRED:
+# - Dell build: x86_64 with OpenMP
+# - Mac Mini build: ARM64 with Metal GPU support
+# ============================================================================
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-REPO_URL="https://github.com/gutchapa/dell-claw-mini.git"
-MIGRATION_DIR="$HOME/dell-claw-migration"
-
-log() {
-    echo -e "${GREEN}[$(date +%H:%M:%S)]${NC} $1"
-}
-
-warn() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-    exit 1
-}
-
-info() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-# Check macOS
-if [[ "$OSTYPE" != "darwin"* ]]; then
-    error "This script is for macOS only (Mac Mini M4)"
-fi
-
-# Check for Apple Silicon
-if [[ $(uname -m) != "arm64" ]]; then
-    warn "Not running on Apple Silicon - Metal GPU acceleration may not work"
-fi
-
-log "🚀 Starting Dell-Claw → Mac Mini M4 Migration"
-log "📁 Migration directory: $MIGRATION_DIR"
-
-# Create migration directory
-mkdir -p "$MIGRATION_DIR"
-cd "$MIGRATION_DIR"
-
-# Clone all branches
-log "📥 Cloning all branches from GitHub..."
-
-BRANCHES=("master" "gbrain-repo" "gbrain-data" "claw-code" "paperclip" "pi" "turboquant")
-
-for branch in "${BRANCHES[@]}"; do
-    log "  → Cloning $branch..."
-    if [ -d "$branch" ]; then
-        warn "$branch already exists, pulling latest..."
-        cd "$branch" && git pull && cd ..
-    else
-        git clone --single-branch --branch "$branch" "$REPO_URL" "$branch"
-    fi
-done
-
-log "✅ All branches cloned!"
-
-# Setup directory structure
-log "📂 Setting up directory structure..."
-
-# GBrain
-if [ -d "$MIGRATION_DIR/gbrain-repo" ]; then
-    log "  → Setting up GBrain source..."
-    mkdir -p "$HOME/gbrain-repo"
-    cp -r "$MIGRATION_DIR/gbrain-repo"/* "$HOME/gbrain-repo/"
-fi
-
-if [ -d "$MIGRATION_DIR/gbrain-data" ]; then
-    log "  → Setting up GBrain database..."
-    mkdir -p "$HOME/.gbrain"
-    cp -r "$MIGRATION_DIR/gbrain-data/brain.pglite" "$HOME/.gbrain/" 2>/dev/null || true
-    cp -r "$MIGRATION_DIR/gbrain-data/config.json" "$HOME/.gbrain/" 2>/dev/null || true
-fi
-
-# OpenClaw workspace
-if [ -d "$MIGRATION_DIR/master" ]; then
-    log "  → Setting up OpenClaw workspace..."
-    mkdir -p "$HOME/.openclaw"
-    cp -r "$MIGRATION_DIR/master" "$HOME/.openclaw/workspace"
-fi
-
-# Pi Agent
-if [ -d "$MIGRATION_DIR/pi" ]; then
-    log "  → Setting up Pi Agent..."
-    mkdir -p "$HOME/.pi"
-    cp -r "$MIGRATION_DIR/pi/agent" "$HOME/.pi/" 2>/dev/null || true
-    cp -r "$MIGRATION_DIR/pi/pi-acp" "$HOME/.pi/" 2>/dev/null || true
-fi
-
-# Claw-code
-if [ -d "$MIGRATION_DIR/claw-code" ]; then
-    log "  → Setting up Claw-Code..."
-    cp -r "$MIGRATION_DIR/claw-code" "$HOME/claw-code"
-fi
-
-# Paperclip
-if [ -d "$MIGRATION_DIR/paperclip" ]; then
-    log "  → Setting up Paperclip..."
-    cp -r "$MIGRATION_DIR/paperclip" "$HOME/paperclip-fork"
-fi
-
-# Turboquant
-if [ -d "$MIGRATION_DIR/turboquant" ]; then
-    log "  → Setting up Turboquant..."
-    cp -r "$MIGRATION_DIR/turboquant" "$HOME/turboquant"
-fi
-
-log "✅ Directory structure complete!"
-
-# Install Bun if not present
-if ! command -v bun &> /dev/null; then
-    log "📦 Installing Bun..."
-    curl -fsSL https://bun.sh/install | bash
-    export PATH="$HOME/.bun/bin:$PATH"
-    echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.zshrc
-fi
-
-# Install jq (for JSON parsing in dashboards)
-if ! command -v jq &> /dev/null; then
-    log "📦 Installing jq..."
-    curl -L https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-arm64 -o "$HOME/.local/bin/jq" 2>/dev/null || curl -L https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-macos-amd64 -o "$HOME/.local/bin/jq"
-    chmod +x "$HOME/.local/bin/jq"
-    export PATH="$HOME/.local/bin:$PATH"
-fi
-
-# Install pnpm if not present
-if ! command -v pnpm &> /dev/null; then
-    log "📦 Installing pnpm..."
-    curl -fsSL https://get.pnpm.io/install.sh | sh -
-    export PATH="$HOME/Library/pnpm:$PATH"
-fi
-
-# Install Ollama with Metal GPU support
-if ! command -v ollama &> /dev/null; then
-    log "🤖 Installing Ollama with Metal GPU support..."
-    curl -fsSL https://ollama.com/install.sh | sh
-else
-    log "🤖 Ollama already installed"
-fi
-
-# Install MLX (Apple's native ML framework - FASTEST on M4)
-log "⚡ Installing MLX (Apple's native ML framework)..."
-if ! python3 -c "import mlx_lm" 2>/dev/null; then
-    log "  → Installing mlx-lm..."
-    pip3 install mlx-lm
-else
-    log "  ✅ MLX already installed"
-fi
-
-# Start Ollama
-log "🚀 Starting Ollama service..."
-ollama serve &
-OLLAMA_PID=$!
-sleep 5
-
-# Pull nomic-embed-text for GBrain
-log "📥 Pulling nomic-embed-text model (for GBrain embeddings)..."
-ollama pull nomic-embed-text
-
-log "✅ Ollama ready with Metal GPU acceleration!"
-
-# Optional: Pull other models
-log "📦 Pulling additional models (this will take time)..."
-if [ -f "$HOME/.openclaw/workspace/pull-ollama-models.sh" ]; then
-    log "  → Running model pull script..."
-    bash "$HOME/.openclaw/workspace/pull-ollama-models.sh" || warn "Some models failed to pull"
-fi
-
-# Setup GBrain
-if [ -d "$HOME/gbrain-repo" ]; then
-    log "🧠 Setting up GBrain..."
-    cd "$HOME/gbrain-repo"
-    
-    if [ ! -d "node_modules" ]; then
-        log "  → Installing GBrain dependencies..."
-        bun install
-    fi
-    
-    log "  → Verifying GBrain..."
-    bun run src/cli.ts stats
-fi
-
-# Setup Paperclip (optional)
-if [ -d "$HOME/paperclip-fork" ]; then
-    log "📎 Setting up Paperclip (optional)..."
-    cd "$HOME/paperclip-fork"
-    
-    if [ ! -d "node_modules" ]; then
-        log "  → Installing Paperclip dependencies..."
-        pnpm install
-    fi
-fi
-
-# Create MLX server script
-log "📝 Creating MLX server script..."
-cat > "$HOME/.openclaw/workspace/mlx-server.sh" << 'EOF'
-#!/bin/bash
-# MLX Server for Mac Mini M4 - FASTEST performance on Apple Silicon
-# Usage: ./mlx-server.sh [model_name]
-
-MODEL=${1:-"mlx-community/Qwen2.5-Coder-14B-Instruct-4bit"}
-echo "🚀 Starting MLX server with $MODEL"
-echo "📡 API endpoint: http://localhost:8080"
-echo "⚡ This uses Apple's Metal GPU - fastest on M4!"
-python3 -m mlx_lm.server --model "$MODEL" --trust-remote-code
-EOF
-chmod +x "$HOME/.openclaw/workspace/mlx-server.sh"
-
-# Create convenience script
-log "📝 Creating convenience scripts..."
-
-cat > "$HOME/.openclaw/workspace/gbrain-query.sh" << 'EOF'
-#!/bin/bash
-# Quick GBrain query helper
-cd "$HOME/gbrain-repo"
-bun run src/cli.ts query "$@"
-EOF
-chmod +x "$HOME/.openclaw/workspace/gbrain-query.sh"
-
-# Create .env template
-if [ ! -f "$HOME/.openclaw/workspace/.env" ]; then
-    log "🔐 Creating .env template (fill in your keys)..."
-    cat > "$HOME/.openclaw/workspace/.env.template" << 'EOF'
-# API Keys - Fill these in from your old .env file
-# DO NOT COMMIT THE ACTUAL .env FILE
-TELEGRAM_BOT_TOKEN=
-OPENCLAW_GATEWAY_TOKEN=
-GOOGLE_API_KEY=
-OPENROUTER_API_KEY=
-PROKERALA_CLIENT_SECRET=
-EOF
-fi
-
-# Summary
-log "🎉 MIGRATION COMPLETE!"
+echo "=========================================="
+echo "Mac Mini M4 Migration Script"
+echo "=========================================="
 echo ""
-echo "========================================="
-echo "  Mac Mini M4 Setup Complete! 🍎"
-echo "========================================="
+
+# Step 1: Clone llama.cpp for Mac
+echo "Step 1: Clone llama.cpp for Apple Silicon"
+echo "------------------------------------------"
+cat << 'LLAMAMAC'
+# On Mac Mini, run these commands:
+
+cd ~
+git clone --depth 1 https://github.com/ggerganov/llama.cpp.git llama.cpp-mac
+
+cd llama.cpp-mac
+
+# Build for Apple Silicon with Metal GPU support
+mkdir build && cd build
+
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLLAMA_METAL=ON \
+  -DLLAMA_METAL_EMBED_LIBRARY=ON \
+  -DCMAKE_SYSTEM_PROCESSOR=arm64 \
+  -DCMAKE_OSX_ARCHITECTURES=arm64
+
+cmake --build . --config Release -j8
+
+# Verify Metal support
+./bin/llama-cli --help | grep -i metal
+
+LLAMAMAC
+
 echo ""
-echo "Installed Components:"
-echo "  ✅ GBrain (38 pages, 81 chunks)"
-echo "  ✅ Ollama with Metal GPU"
-echo "  ✅ MLX (Apple's native ML - FASTEST on M4!)"
-echo "  ✅ nomic-embed-text model"
-echo "  ✅ OpenClaw workspace"
-echo "  ✅ Pi Agent config"
-echo "  ✅ Claw-Code"
-echo "  ✅ Paperclip fork"
-echo "  ✅ Turboquant"
+echo "Step 2: Copy Models from Dell"
+echo "------------------------------------------"
+cat << 'MODELS'
+# On Dell, copy models to shared location:
+rsync -avz ~/models/ user@mac-mini-ip:~/models/
+
+# Or use USB drive, cloud storage, etc.
+MODELS
+
 echo ""
-echo "Quick Commands:"
-echo "  cd ~/gbrain-repo && bun run src/cli.ts query 'your question'"
-echo "  ollama list"
-echo "  ollama run qwen2.5-coder:0.5b"
-echo "  ~/.openclaw/workspace/mlx-server.sh  # MLX (fastest!)"
+echo "Step 3: Update OpenClaw Workspace"
+echo "------------------------------------------"
+cat << 'WORKSPACE'
+# Clone workspace on Mac Mini:
+git clone https://github.com/gutchapa/dell-claw-mini.git openclaw-workspace
+
+# Install OpenClaw for macOS:
+# (Check OpenClaw docs for Mac installation)
+WORKSPACE
+
 echo ""
-echo "⚠️  ACTION REQUIRED:"
-echo "  1. Copy your .env file from old machine to ~/.openclaw/workspace/.env"
-echo "  2. Test GBrain: cd ~/gbrain-repo && bun run src/cli.ts query 'Project Hail Mary'"
-echo "  3. Pull more models: ollama pull qwen2.5-coder:14b"
+echo "Step 4: Test llama.cpp on Mac Mini"
+echo "------------------------------------------"
+cat << 'TEST'
+# Test with Qwen model (should be ~2x faster with Metal):
+~/llama.cpp-mac/build/bin/llama-cli \
+  -m ~/models/phi3-mini-q3.gguf \
+  -p "Hello" -n 50 \
+  -ngl 99  # Use all Metal GPU layers
+
+# Expected: 10+ tok/s (vs 5-6 on Dell)
+TEST
+
 echo ""
-echo "Migration directory: $MIGRATION_DIR"
-echo "========================================="
+echo "=========================================="
+echo "LLAMA.CPP MAC MINI ADVANTAGES:"
+echo "=========================================="
+echo ""
+echo "✅ Metal GPU acceleration (~2x faster)"
+echo "✅ 16GB unified RAM (no WSL overhead)"
+echo "✅ Can run larger models (up to 14B Q4)"
+echo "✅ Native ARM64 (no Rosetta translation)"
+echo ""
+echo "Commands to run on Mac Mini are shown above."
+echo "Copy and execute them after SSH into Mac Mini."
