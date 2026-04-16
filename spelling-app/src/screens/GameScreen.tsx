@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import * as Speech from 'expo-speech';
+import { StyleSheet } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { Layout, Text, Card, Input, Button, ProgressBar, Icon } from '@ui-kitten/components';
+import * as Speech from 'expo-speech';
 import { RootStackParamList, Word, WrongWord } from '../types';
 import { getRandomWords } from '../data/words';
 import { Feedback } from '../components/Feedback';
@@ -9,6 +10,14 @@ import { Feedback } from '../components/Feedback';
 type GameScreenProps = NativeStackScreenProps<RootStackParamList, 'Game'>;
 
 const GAME_DURATION = 30 * 60;
+
+const SpeakerIcon = (props: any) => (
+  <Icon {...props} name='volume-up-outline' />
+);
+
+const HintIcon = (props: any) => (
+  <Icon {...props} name='bulb-outline' />
+);
 
 export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => {
   const { difficulty, practiceWords } = route.params;
@@ -103,45 +112,65 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
   }, [words, currentIndex, userInput, streak, endGame]);
 
   const currentWord = words[currentIndex];
+  const progress = words.length > 0 ? (currentIndex + 1) / words.length : 0;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.timer}>⏱️ {formatTime(timeLeft)}</Text>
-        <Text style={styles.score}>Score: {score} | Streak: {streak}</Text>
-      </View>
+    <Layout style={styles.container}>
+      {/* Header Stats */}
+      <Layout style={styles.header}>
+        <Layout style={styles.statRow}>
+          <Text category='s1'>⏱️ {formatTime(timeLeft)}</Text>
+          <Text category='s1'>Score: {score}</Text>
+          <Text category='s1'>🔥 {streak}</Text>
+        </Layout>
+        <ProgressBar
+          progress={progress}
+          style={styles.progressBar}
+          status='primary'
+        />
+        <Text category='c1' style={styles.progressText}>
+          Word {currentIndex + 1} of {words.length}
+        </Text>
+      </Layout>
 
       {currentWord && (
-        <>
-          <Text style={styles.wordNumber}>
-            Word {currentIndex + 1} of {words.length}
-          </Text>
+        <Card style={styles.gameCard}>
+          {/* Speak Button */}
+          <Button
+            style={styles.speakButton}
+            accessoryLeft={SpeakerIcon}
+            onPress={speakWord}
+            status='primary'
+          >
+            Listen to Word
+          </Button>
 
-          <TouchableOpacity style={styles.speakButton} onPress={speakWord}>
-            <Text style={styles.speakButtonText}>🔊 Listen</Text>
-          </TouchableOpacity>
-
-          {/* Masked Hint Display */}
-          <View style={styles.maskedHintContainer}>
-            <Text style={styles.maskedHintLabel}>Hint:</Text>
-            <Text style={styles.maskedHintText}>{currentWord.maskedHint}</Text>
-          </View>
+          {/* Masked Hint */}
+          <Layout style={styles.maskedHintContainer}>
+            <Text category='label' appearance='hint'>Hint:</Text>
+            <Text category='h1' status='info' style={styles.maskedHint}>
+              {currentWord.maskedHint}
+            </Text>
+          </Layout>
 
           {showHint && (
-            <Text style={styles.hint}>💡 {currentWord.hint}</Text>
+            <Text category='p2' style={styles.hintText}>
+              💡 {currentWord.hint}
+            </Text>
           )}
 
-          <TextInput
+          {/* Input */}
+          <Input
             style={styles.input}
+            placeholder='Type the word...'
             value={userInput}
             onChangeText={setUserInput}
-            placeholder="Type the word..."
-            placeholderTextColor="#999"
-            autoCapitalize="none"
+            disabled={showFeedback}
+            autoCapitalize='none'
             autoCorrect={false}
-            editable={!showFeedback}
           />
 
+          {/* Feedback */}
           {showFeedback && (
             <Feedback
               isCorrect={lastAnswerCorrect}
@@ -150,141 +179,96 @@ export const GameScreen: React.FC<GameScreenProps> = ({ navigation, route }) => 
             />
           )}
 
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[styles.hintButton, showFeedback && styles.disabledButton]}
+          {/* Action Buttons */}
+          <Layout style={styles.buttonRow}>
+            <Button
+              style={styles.hintButton}
+              accessoryLeft={HintIcon}
+              appearance='outline'
+              status='warning'
               onPress={() => setShowHint(true)}
               disabled={showFeedback}
             >
-              <Text style={styles.hintButtonText}>💡 Hint</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.submitButton, showFeedback && styles.disabledButton]}
+              Hint
+            </Button>
+            <Button
+              style={styles.submitButton}
+              status='success'
               onPress={checkAnswer}
-              disabled={showFeedback}
+              disabled={showFeedback || !userInput.trim()}
             >
-              <Text style={styles.submitButtonText}>✓ Submit</Text>
-            </TouchableOpacity>
-          </View>
-        </>
+              Submit
+            </Button>
+          </Layout>
+        </Card>
       )}
-    </View>
+    </Layout>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-    justifyContent: 'center',
+    padding: 16,
+    backgroundColor: '#f7f9fc',
   },
   header: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
-  timer: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#333',
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
-  score: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#666',
-    marginTop: 5,
+  progressBar: {
+    height: 8,
+    borderRadius: 4,
   },
-  wordNumber: {
+  progressText: {
     textAlign: 'center',
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    marginTop: 4,
+  },
+  gameCard: {
+    borderRadius: 12,
+    padding: 16,
   },
   speakButton: {
-    backgroundColor: '#6200ee',
-    padding: 20,
-    borderRadius: 50,
-    alignItems: 'center',
-    marginBottom: 20,
-    elevation: 3,
-  },
-  speakButtonText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+    marginBottom: 16,
+    borderRadius: 8,
   },
   maskedHintContainer: {
-    backgroundColor: '#e3f2fd',
-    padding: 20,
-    borderRadius: 15,
-    marginBottom: 20,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#2196F3',
-  },
-  maskedHintLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 5,
-  },
-  maskedHintText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2196F3',
-    letterSpacing: 8,
-  },
-  hint: {
-    textAlign: 'center',
-    fontSize: 16,
-    fontStyle: 'italic',
-    marginBottom: 20,
-    padding: 10,
-    backgroundColor: '#fff9c4',
+    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#E3F2FD',
     borderRadius: 8,
-    color: '#333',
+  },
+  maskedHint: {
+    letterSpacing: 8,
+    marginTop: 8,
+  },
+  hintText: {
+    textAlign: 'center',
+    marginBottom: 16,
+    fontStyle: 'italic',
+    backgroundColor: '#FFF9C4',
+    padding: 12,
+    borderRadius: 8,
   },
   input: {
-    borderWidth: 2,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    padding: 15,
-    fontSize: 20,
-    textAlign: 'center',
-    marginBottom: 15,
-    backgroundColor: '#fff',
+    marginBottom: 16,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 10,
-    marginTop: 10,
+    gap: 12,
+    marginTop: 8,
   },
   hintButton: {
     flex: 1,
-    backgroundColor: '#FFC107',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  hintButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
   },
   submitButton: {
     flex: 2,
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  disabledButton: {
-    opacity: 0.5,
   },
 });
 

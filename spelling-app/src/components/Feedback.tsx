@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Layout, Text, Card, Button, Icon } from '@ui-kitten/components';
 
 interface FeedbackProps {
   isCorrect: boolean;
@@ -7,51 +8,82 @@ interface FeedbackProps {
   correctAnswer: string;
 }
 
+const CheckIcon = (props: any) => (
+  <Icon {...props} name='checkmark-circle-2' fill='#4CAF50' />
+);
+
+const CloseIcon = (props: any) => (
+  <Icon {...props} name='close-circle' fill='#F44336' />
+);
+
 export const Feedback: React.FC<FeedbackProps> = ({ isCorrect, userAnswer, correctAnswer }) => {
+  if (isCorrect) {
+    return (
+      <Card status='success' style={styles.card}>
+        <Layout style={styles.correctContainer}>
+          <Icon name='checkmark-circle-2' fill='#4CAF50' style={styles.icon} />
+          <Text category='h5' status='success'>Correct!</Text>
+          <Text category='s1'>+10 points</Text>
+        </Layout>
+      </Card>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      {isCorrect ? (
-        <Text style={styles.correctText}>✅ Correct!</Text>
-      ) : (
-        <View style={styles.wrongContainer}>
-          <Text style={styles.wrongAnswerText}>
-            Your answer: ❌ {userAnswer || '(empty)'}
+    <Card status='danger' style={styles.card}>
+      <Layout style={styles.wrongContainer}>
+        <Icon name='close-circle' fill='#F44336' style={styles.icon} />
+        <Text category='h6' status='danger'>Incorrect</Text>
+        
+        <Layout style={styles.answerContainer}>
+          <Text category='s2' style={styles.yourAnswer}>
+            Your answer:{' '}
+            <Text style={styles.strikethrough}>{userAnswer}</Text>
           </Text>
-          <Text style={styles.correctAnswerText}>
-            Correct: ✅ {correctAnswer}
+          <Text category='s2' status='success'>
+            Correct: {correctAnswer}
           </Text>
-        </View>
-      )}
-    </View>
+        </Layout>
+
+        <Text category='c1' appearance='hint' style={styles.nextHint}>
+          Next word in 2 seconds...
+        </Text>
+      </Layout>
+    </Card>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    marginVertical: 15,
-    padding: 15,
-    borderRadius: 10,
-    backgroundColor: '#f9f9f9',
+  card: {
+    marginVertical: 12,
+    borderRadius: 8,
   },
-  correctText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#4CAF50',
-    textAlign: 'center',
+  correctContainer: {
+    alignItems: 'center',
+    padding: 8,
   },
   wrongContainer: {
     alignItems: 'center',
+    padding: 8,
   },
-  wrongAnswerText: {
-    fontSize: 18,
-    color: '#F44336',
-    fontWeight: '600',
+  icon: {
+    width: 48,
+    height: 48,
     marginBottom: 8,
   },
-  correctAnswerText: {
-    fontSize: 18,
-    color: '#4CAF50',
-    fontWeight: '600',
+  answerContainer: {
+    marginVertical: 12,
+    alignItems: 'center',
+  },
+  yourAnswer: {
+    marginBottom: 4,
+  },
+  strikethrough: {
+    textDecorationLine: 'line-through',
+    color: '#F44336',
+  },
+  nextHint: {
+    marginTop: 8,
   },
 });
 
