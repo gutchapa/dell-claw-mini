@@ -211,3 +211,47 @@ The goal: Be helpful without being annoying. Check in a few times a day, do usef
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+## Location Message Handling
+
+### Driving Assistant Skill
+
+When user shares a location (Telegram share location button) or sends coordinates like "12.9082,80.2278":
+
+**Steps:**
+1. Extract latitude and longitude from the message
+2. Acknowledge: "📍 Got your location, searching nearby places..."
+3. Run: `node ~/.openclaw/skills/driving-assistant/nearby.js <lat> <lng>`
+4. Send script output directly to user (already formatted as Telegram HTML)
+
+**Fallbacks:**
+- If no location: "Please tap 📎 → Location → Share My Live Location"
+- If GOOGLE_PLACES_API_KEY not set: "Need API key configured"
+
+**Example trigger phrases:**
+- "where am I" → ask for location
+- "12.9716,77.5946" → parse as lat,lng and run script
+- "what's nearby" → ask for location
+- "petrol bunk near me" → ask for location
+
+## "whereami" Command
+
+When user says "whereami" after sharing location:
+
+**If they provided start/destination earlier:**
+1. Use cached route from `.route_cache.json`
+2. Run: `node nearby.js <lat> <lng>`
+3. Script auto-filters to show only places AHEAD
+
+**If no route cached:**
+1. Ask: "Where are you heading? Share destination coordinates"
+2. Save: Start=current location, Destination=their input
+3. Then run directional search
+
+**Features shown:**
+- ⛽ Petrol bunks (10km ahead)
+- 🍽️ Pure veg restaurants (5km ahead)
+- 🛣️ Toll plazas (15km ahead)
+- 🏧 ATMs (5km, any direction)
+
+**All filtered to show ONLY what's ahead of travel direction!**
