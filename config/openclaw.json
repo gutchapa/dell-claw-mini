@@ -1,0 +1,417 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.4.1",
+    "lastTouchedAt": "2026-04-04T13:58:49.605Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-31T09:49:00.801Z",
+    "lastRunVersion": "2026.3.28",
+    "lastRunCommand": "onboard",
+    "lastRunMode": "local"
+  },
+  "bindings": [
+    {
+      "type": "route",
+      "agentId": "main",
+      "match": {
+        "channel": "telegram",
+        "accountId": "default"
+      }
+    }
+  ],
+  "auth": {
+    "profiles": {
+      "kimi:default": {
+        "provider": "kimi",
+        "mode": "api_key"
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "kimi": {
+        "baseUrl": "https://api.kimi.com/coding/",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "kimi-code",
+            "name": "Kimi Code",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 262144,
+            "maxTokens": 32768
+          }
+        ]
+      },
+      "ollama": {
+        "baseUrl": "http://localhost:11434",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "tinydolphin",
+            "name": "TinyDolphin Local",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "gemma3:1b",
+            "name": "Gemma 3 1B",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32000,
+            "maxTokens": 4096
+          },
+          {
+            "id": "gemma3:4b",
+            "name": "Gemma 3 4B",
+            "reasoning": true,
+            "input": [
+              "text",
+              "image"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "tinydolphin:latest",
+            "name": "TinyDolphin 1B (Local)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 2048,
+            "maxTokens": 512
+          },
+          {
+            "id": "phi3:mini",
+            "name": "Phi-3 Mini 3.8B (Local)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 4096,
+            "maxTokens": 2048
+          }
+        ]
+      },
+      "gemma-local": {
+        "baseUrl": "http://127.0.0.1:8080/v1",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "gemma-4-e2b.gguf",
+            "name": "Gemma 4 E2B (Local llama.cpp)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 131072,
+            "maxTokens": 4096
+          }
+        ]
+      }
+    }
+  },
+  "tools": {
+    "profile": "coding",
+    "web": {
+      "search": {
+        "enabled": true,
+        "provider": "gemini"
+      }
+    },
+    "fs": {
+      "workspaceOnly": false
+    },
+    "elevated": {
+      "enabled": true,
+      "allowFrom": {
+        "telegram": [
+          "*"
+        ]
+      }
+    },
+    "exec": {
+      "security": "full"
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "main",
+    "mainKey": "agent:main:telegram:direct:791865934",
+    "idleMinutes": 2880,
+    "reset": {
+      "mode": "idle",
+      "idleMinutes": 2880
+    },
+    "resetByType": {
+      "direct": {
+        "mode": "idle",
+        "idleMinutes": 2880
+      }
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "bootstrap-extra-files": {
+          "enabled": true,
+          "files": [
+            "/home/dell/.openclaw/AGENTS.md",
+            "/home/dell/.openclaw/SESSIONS.md",
+            "/home/dell/.openclaw/SOUL.md",
+            "/home/dell/.openclaw/PROGRESS.md",
+            "/home/dell/.openclaw/USER.md",
+            "/home/dell/.openclaw/TOOLS.md",
+            "/home/dell/.openclaw/HEARTBEAT.md",
+            "/home/dell/.openclaw/MEMORY.md"
+          ]
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true,
+          "messages": 50
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "open",
+      "allowFrom": [
+        "*"
+      ],
+      "botToken": {
+        "source": "env",
+        "provider": "default",
+        "id": "TELEGRAM_BOT_TOKEN"
+      },
+      "groups": {},
+      "groupPolicy": "allowlist",
+      "streaming": "partial",
+      "mediaMaxMb": 100,
+      "retry": {
+        "attempts": 3,
+        "maxDelayMs": 30000
+      },
+      "network": {
+        "dnsResultOrder": "ipv4first",
+        "autoSelectFamily": false
+      }
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "controlUi": {
+      "allowInsecureAuth": true
+    },
+    "auth": {
+      "mode": "token",
+      "token": {
+        "source": "env",
+        "provider": "default",
+        "id": "OPENCLAW_GATEWAY_TOKEN"
+      }
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "remote": {},
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send"
+      ]
+    }
+  },
+  "acp": {
+    "enabled": true,
+    "dispatch": {
+      "enabled": true
+    },
+    "backend": "acpx",
+    "defaultAgent": "pi",
+    "allowedAgents": [
+      "claude",
+      "codex",
+      "copilot",
+      "cursor",
+      "droid",
+      "gemini",
+      "iflow",
+      "kilocode",
+      "kimi",
+      "kiro",
+      "openclaw",
+      "opencode",
+      "pi",
+      "qwen"
+    ],
+    "maxConcurrentSessions": 8,
+    "stream": {
+      "coalesceIdleMs": 300,
+      "maxChunkChars": 1200
+    },
+    "runtime": {
+      "ttlMinutes": 120
+    }
+  },
+  "agents": {
+    "list": [
+      {
+        "id": "main",
+        "default": true,
+        "name": "Main Agent",
+        "workspace": "~/.openclaw/workspace",
+        "model": "kimi/kimi-code",
+        "subagents": {
+          "allowAgents": [
+            "*"
+          ]
+        }
+      },
+      {
+        "id": "pi",
+        "name": "Pi Agent",
+        "workspace": "~/.openclaw/workspace-pi",
+        "runtime": {
+          "type": "acp",
+          "acp": {
+            "agent": "pi",
+            "backend": "acpx",
+            "mode": "persistent"
+          }
+        }
+      }
+    ],
+    "defaults": {
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokens": 48000,
+        "keepRecentTokens": 24000,
+        "reserveTokensFloor": 16000,
+        "maxHistoryShare": 0.75,
+        "recentTurnsPreserve": 8,
+        "identifierPolicy": "strict"
+      },
+      "memorySearch": {
+        "enabled": true,
+        "query": {
+          "maxResults": 10,
+          "minScore": 0.6,
+          "hybrid": {
+            "enabled": true,
+            "vectorWeight": 0.7,
+            "textWeight": 0.3
+          }
+        }
+      }
+    }
+  },
+  "plugins": {
+    "enabled": true,
+    "load": {
+      "paths": [
+        "/home/dell/.openclaw/plugins"
+      ]
+    },
+    "entries": {
+      "acpx": {
+        "enabled": true,
+        "config": {
+          "permissionMode": "approve-all",
+          "nonInteractivePermissions": "fail",
+          "pluginToolsMcpBridge": false
+        }
+      },
+      "custom-router-plugin": {
+        "enabled": false,
+        "config": {}
+      },
+      "google": {
+        "enabled": true,
+        "config": {
+          "webSearch": {
+            "apiKey": {
+              "source": "env",
+              "provider": "default",
+              "id": "GOOGLE_API_KEY"
+            }
+          }
+        }
+      }
+    }
+  }
+}
