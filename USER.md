@@ -99,7 +99,12 @@ _Learn about the person you're helping. Update this as you go._
 ## **Active Projects**
 
 ### **High Priority:**
-1. **Mac Mini M4 Migration** — Complete stack migration (OpenClaw, Pi, Paperclip, TurboQuant, Ollama)
+1. **Mac Mini M4 Migration** — **CODE READY** — Stack migration (OpenClaw, Pi, Paperclip, TurboQuant, Ollama). Branch: `dell-mini-pc-setup-v3`
+   - ✅ SOUL-EL (Enforcement Layer) committed
+   - ✅ Dynamic Deployment committed  
+   - ✅ Code Burn fixes committed
+   - ✅ Browser components: `simple-browser/`, `simple-browser-ts/`
+   - ⚠️ Action needed: Update hardcoded `/home/dell` paths → `/Users/$USER`
 2. **WhatsApp Business Setup** — Finalize vendor (Gupshup/ValueFirst) for school
 3. **Intel AX200 Installation** — Hardware swap for HP laptop
 
@@ -128,5 +133,5 @@ _Learn about the person you're helping. Update this as you go._
 
 ---
 
-_Updated: 2026-04-09_
-_Next review: When Mac Mini arrives or new major project starts_
+_Updated: 2026-04-18_
+_Next review: Mac Mini migration execution_
