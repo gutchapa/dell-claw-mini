@@ -45,6 +45,13 @@ check_action() {
         violations+=("DO NOT INTERVENE IN CREWAI REVIEW")
     fi
     
+    # Check 5: Claiming success without a Receipt
+    if echo \"$action_lower\" | grep -qE \"(done|complete|success|finished|ready)\"; then
+        if ! echo \"$action_lower\" | grep -qE \"(ls -l|head|cat|receipt|evidence|proof)\"; then
+            violations+=(\"PROVIDE VERIFICATION RECEIPT (ls -l + head)\")
+        fi
+    fi
+    
     if [ ${#violations[@]} -eq 0 ]; then
         echo "✅ PASS - No SOUL.md violations"
         return 0

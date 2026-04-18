@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f0f0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background: #6200ee;
+            color: white;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            font-size: 18px;
+        }
+        .dashboard-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .dashboard {
+            background: white;
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: none;
+        }
+        .dashboard.active {
+            display: block;
+        }
+        .metrics {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        .metric {
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #6200ee;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #666;
+        }
+        .address-bar {
+            display: flex;
+            padding: 10px;
+            background: white;
+            border-bottom: 1px solid #ddd;
+            gap: 10px;
+        }
+        .nav-btn {
+            padding: 10px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: #6200ee;
+        }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        #urlInput {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+        .go-btn {
+            padding: 10px 20px;
+            background: #6200ee;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .info {
+            padding: 10px;
+            background: #e3f2fd;
+            font-size: 12px;
+            color: #1565c0;
+        }
+        .browser-frame {
+            flex: 1;
+            background: white;
+            margin: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        #browserFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #666;
+        }
+        .error {
+            padding: 20px;
+            text-align: center;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌐 Simple Browser</h1>
+        <button class="dashboard-btn" onclick="toggleDashboard()">📊</button>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <h3>📊 Dashboard</h3>
+        <div class="metrics">
+            <div class="metric">
+                <div class="metric-value" id="loadCount">0</div>
+                <div class="metric-label">Pages Loaded</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="sessionTime">0m</div>
+                <div class="metric-label">Session Time</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value" id="currentUrl">-</div>
+                <div class="metric-label">Current URL</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="address-bar">
+        <button class="nav-btn" id="backBtn" onclick="goBack()" disabled>◀</button>
+        <button class="nav-btn" id="forwardBtn" onclick="goForward()" disabled>▶</button>
+        <input type="text" id="urlInput" placeholder="Enter URL (e.g., wikipedia.org)" value="https://www.wikipedia.org">
+        <button class="go-btn" onclick="navigate()">GO</button>
+        <button class="nav-btn" onclick="reload()">↻</button>
+    </div>
+
+    <div class="info">
+        💡 This is a simple iframe-based browser. Some sites (Google, Facebook) block embedding.
+    </div>
+
+    <div class="browser-frame">
+        <div class="loading" id="loading">Loading...</div>
+        <iframe id="browserFrame" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+    </div>
+
+    <script>
+        let history = [];
+        let historyIndex = -1;
+        let loadCount = 0;
+        let sessionStart = Date.now();
+
+        function toggleDashboard() {
+            document.getElementById('dashboard').classList.toggle('active');
+        }
+
+        function updateSessionTime() {
+            const mins = Math.floor((Date.now() - sessionStart) / 60000);
+            document.getElementById('sessionTime').textContent = mins + 'm';
+        }
+        setInterval(updateSessionTime, 60000);
+
+        function navigate() {
+            let url = document.getElementById('urlInput').value.trim();
+            if (!url) return;
+            
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+
+            // Add to history
+            history = history.slice(0, historyIndex + 1);
+            history.push(url);
+            historyIndex++;
+            updateNavButtons();
+
+            loadUrl(url);
+        }
+
+        function loadUrl(url) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('browserFrame').src = url;
+            document.getElementById('currentUrl').textContent = new URL(url).hostname;
+            
+            loadCount++;
+            document.getElementById('loadCount').textContent = loadCount;
+        }
+
+        function goBack() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                document.getElementById('urlInput').value = history[historyIndex];
+                loadUrl(history[historyIndex]);
+                updateNavButtons();
+            }
+        }
+
+        function goForward() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                document.getElementById('urlInput').value = history[historyIndex];
+                loadUrl(history[historyIndex]);
+                updateNavButtons();
+            }
+        }
+
+        function reload() {
+            const frame = document.getElementById('browserFrame');
+            frame.src = frame.src;
+        }
+
+        function updateNavButtons() {
+            document.getElementById('backBtn').disabled = historyIndex <= 0;
+            document.getElementById('forwardBtn').disabled = historyIndex >= history.length - 1;
+        }
+
+        document.getElementById('browserFrame').onload = function() {
+            document.getElementById('loading').style.display = 'none';
+        };
+
+        document.getElementById('browserFrame').onerror = function() {
+            document.getElementById('loading').textContent = 'Failed to load';
+        };
+
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') navigate();
+        });
+
+        // Load initial page
+        navigate();
+    </script>
+</body>
+</html>
