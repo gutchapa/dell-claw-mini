@@ -14,16 +14,19 @@
 **Root Cause:** Used `ls` root only, not recursive `find`.  
 **Fix:** ALWAYS run generic recursive search before claiming "not found".
 
-**AGENTS.md Rule:**
+**AGENTS.md Rule - Search Windows:**
 ```bash
-# Search ALL of workspace (not just root)
-find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -1 2>/dev/null
+# Recent context: Last 7 days
+find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -7 2>/dev/null
 
-# Look for ANY cache/state/route files
-find /home/dell/.openclaw/workspace -maxdepth 2 -name "*.json" 2>/dev/null
+# Broader context: Last 30 days (for ongoing projects)
+find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -30 2>/dev/null
+
+# All JSON files for dynamic discovery
+find /home/dell/.openclaw/workspace -maxdepth 3 -name "*.json" 2>/dev/null
 ```
 
-**Principle:** Generic search beats hardcoded paths. New topics/tools = new subdirectories I won't know about.
+**Principle:** Context expires slowly. A conversation from 5 days ago is still relevant. Search 7-30 days back, not just 24 hours.
 
 ### Lesson 2: Memory Persistence Gaps
 **Date:** April 19, 2025  

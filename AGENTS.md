@@ -15,21 +15,24 @@ Before doing anything else:
 3. Read `SESSIONS.md` — history of tasks and setup
 4. **🔍 DEEP CONTEXT SEARCH:** Run this find command to discover ALL recent activity:
    ```bash
-   # Search for ALL recently modified files in workspace (last 24h)
-   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" -o -name "*.txt" \) -mtime -1 2>/dev/null | head -20
+   # Search for ALL files modified in last 7 days (recent context)
+   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" -o -name "*.txt" \) -mtime -7 2>/dev/null | head -30
    
-   # Check ALL subdirectories for context files
-   find /home/dell/.openclaw/workspace -maxdepth 2 -name "*.json" -type f 2>/dev/null | head -20
+   # Also check for files modified in last 30 days (broader context)
+   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" -o -name "*.txt" \) -mtime -30 2>/dev/null | head -50
    
-   # Read any files that look like session data, cache, or state
-   for file in $(find /home/dell/.openclaw/workspace -maxdepth 2 -name "*cache*.json" -o -name "*state*.json" -o -name "*route*.json" 2>/dev/null | head -5); do
-       echo "Found context file: $file"
+   # Discover ALL subdirectories with JSON files (dynamic discovery)
+   find /home/dell/.openclaw/workspace -maxdepth 2 -name "*.json" -type f 2>/dev/null | head -30
+   
+   # Look for ANY cache/state/route/session files
+   for file in $(find /home/dell/.openclaw/workspace -maxdepth 3 \( -name "*cache*" -o -name "*state*" -o -name "*session*" -o -name "*route*" \) -type f 2>/dev/null | head -10); do
+       echo "Found context file: $file (modified: $(stat -c %y "$file" 2>/dev/null || stat -f %Sm "$file" 2>/dev/null))"
    done
    ```
-5. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
+5. Read `memory/YYYY-MM-DD.md` (today + last 7 days) for recent context
 6. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
 
-**Rule:** Never claim "I don't have X" until you've searched the ENTIRE workspace recursively.
+**Rule:** Never claim "I don't have X" until you've searched the ENTIRE workspace recursively for the last 30 days.
 
 Don't ask permission. Just do it.
 
