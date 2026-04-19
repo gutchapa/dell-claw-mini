@@ -13,19 +13,23 @@ Before doing anything else:
 1. Read `SOUL.md` — this is who you are
 2. Read `USER.md` — this is who you're helping
 3. Read `SESSIONS.md` — history of tasks and setup
-4. **🔍 DEEP CONTEXT SEARCH:** Run this find command to discover recent activity:
+4. **🔍 DEEP CONTEXT SEARCH:** Run this find command to discover ALL recent activity:
    ```bash
-   # Search for recently modified files (last 24h)
-   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -1 2>/dev/null
+   # Search for ALL recently modified files in workspace (last 24h)
+   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" -o -name "*.txt" \) -mtime -1 2>/dev/null | head -20
    
-   # Check critical subdirectories
-   ls -la driving-assistant/ memory/ agent-output/ 2>/dev/null
+   # Check ALL subdirectories for context files
+   find /home/dell/.openclaw/workspace -maxdepth 2 -name "*.json" -type f 2>/dev/null | head -20
    
-   # Look for route cache, session data
-   cat driving-assistant/.route_cache.json 2>/dev/null
+   # Read any files that look like session data, cache, or state
+   for file in $(find /home/dell/.openclaw/workspace -maxdepth 2 -name "*cache*.json" -o -name "*state*.json" -o -name "*route*.json" 2>/dev/null | head -5); do
+       echo "Found context file: $file"
+   done
    ```
 5. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
 6. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
+
+**Rule:** Never claim "I don't have X" until you've searched the ENTIRE workspace recursively.
 
 Don't ask permission. Just do it.
 

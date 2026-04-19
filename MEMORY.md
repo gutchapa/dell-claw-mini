@@ -10,13 +10,20 @@
 
 ### Lesson 1: Deep Search Protocol
 **Date:** April 19, 2025  
-**Mistake:** Claimed "no memory" of user's Thanjavur trip because `.route_cache.json` was in `driving-assistant/` subdirectory, not root.  
+**Mistake:** Claimed "no memory" of user's Thanjavur trip because I didn't search recursively. File was in `driving-assistant/.route_cache.json`.  
 **Root Cause:** Used `ls` root only, not recursive `find`.  
-**Fix:** Always run deep search on startup (added to AGENTS.md).  
-**Command:**
+**Fix:** ALWAYS run generic recursive search before claiming "not found".
+
+**AGENTS.md Rule:**
 ```bash
+# Search ALL of workspace (not just root)
 find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -1 2>/dev/null
+
+# Look for ANY cache/state/route files
+find /home/dell/.openclaw/workspace -maxdepth 2 -name "*.json" 2>/dev/null
 ```
+
+**Principle:** Generic search beats hardcoded paths. New topics/tools = new subdirectories I won't know about.
 
 ### Lesson 2: Memory Persistence Gaps
 **Date:** April 19, 2025  
