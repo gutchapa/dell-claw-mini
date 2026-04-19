@@ -13,8 +13,19 @@ Before doing anything else:
 1. Read `SOUL.md` — this is who you are
 2. Read `USER.md` — this is who you're helping
 3. Read `SESSIONS.md` — history of tasks and setup
-4. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
-5. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
+4. **🔍 DEEP CONTEXT SEARCH:** Run this find command to discover recent activity:
+   ```bash
+   # Search for recently modified files (last 24h)
+   find /home/dell/.openclaw/workspace -type f \( -name "*.json" -o -name "*.md" \) -mtime -1 2>/dev/null
+   
+   # Check critical subdirectories
+   ls -la driving-assistant/ memory/ agent-output/ 2>/dev/null
+   
+   # Look for route cache, session data
+   cat driving-assistant/.route_cache.json 2>/dev/null
+   ```
+5. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
+6. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
 
 Don't ask permission. Just do it.
 
