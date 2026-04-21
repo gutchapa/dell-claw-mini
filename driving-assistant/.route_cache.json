@@ -1,11 +1,17 @@
 {
   "start": {
-    "lat": 12.988956,
-    "lng": 80.22145
+    "lat": 10.773329,
+    "lng": 79.136148,
+    "name": "Thanjavur"
   },
   "destination": {
-    "lat": 11.2189,
-    "lng": 78.1675
+    "lat": 11.9416,
+    "lng": 79.8083,
+    "name": "Pondicherry"
   },
-  "timestamp": 1776313635483
+  "route": "Thanjavur → Kumbakonam → Chidambaram → Cuddalore → Pondicherry",
+  "via": "Chidambaram (SH 64 + State Roads)",
+  "distance_km": 165,
+  "estimated_time": "3.5 hours",
+  "timestamp": 1776160080000
 }
