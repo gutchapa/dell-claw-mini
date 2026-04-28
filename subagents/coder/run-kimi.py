@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import os
+import os.path
 """Coder Agent with Kimi Code API - High performance cloud model"""
 import json, requests, sys, os, time, subprocess
 
-WORKSPACE = '/home/dell/.openclaw/workspace'
+WORKSPACE = os.path.expanduser('~/.openclaw/workspace')
 MODEL = 'kimi-code'
 API_URL = 'https://api.kimi.com/coding/v1/messages'
 # Using the key found in your PI_SETUP.md / crewai scripts

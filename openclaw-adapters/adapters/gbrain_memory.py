@@ -5,8 +5,8 @@ import os
 
 class GBrainMemory:
     def __init__(self):
-        self.workspace = os.environ.get('WORKSPACE', '/home/dell/.openclaw/workspace')
-        self.gbrain_repo = os.environ.get('GBRAIN_REPO', '/home/dell/gbrain-repo')
+        self.workspace = os.environ.get('WORKSPACE', os.path.expanduser('~/.openclaw/workspace'))
+        self.gbrain_repo = os.environ.get('GBRAIN_REPO', os.path.expanduser('~/gbrain-repo'))
     
     def add(self, text, metadata=None):
         """Add memory to GBrain"""

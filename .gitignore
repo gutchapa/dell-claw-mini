@@ -1,3 +1,12 @@
 node_modules/
 .expo/
 agent-output/test_*/
+
+# Python cache
+*.pyc
+__pycache__/
+agent-output/
+orchestrator/queue/
+temp_memory.txt
+last_generated_code.py
+CONFIG_CHANGES_LOG.md

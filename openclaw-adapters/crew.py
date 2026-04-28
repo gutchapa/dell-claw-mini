@@ -4,7 +4,7 @@ import os
 import sys
 
 # Add adapters to path
-sys.path.insert(0, '/home/dell/crewai-integration/openclaw-adapters')
+sys.path.insert(0, os.path.expanduser('~/.openclaw/workspace/openclaw-adapters'))
 
 from adapters.ollama_llm import OllamaLLM
 from adapters.gbrain_memory import GBrainMemory
@@ -13,7 +13,7 @@ class OpenClawCrew:
     """CrewAI crew using our local stack"""
     
     def __init__(self):
-        self.workspace = os.environ.get('WORKSPACE', '/home/dell/.openclaw/workspace')
+        self.workspace = os.environ.get('WORKSPACE', os.path.expanduser('~/.openclaw/workspace'))
         self.llm = OllamaLLM(model="phi3:mini")
         self.memory = GBrainMemory()
     

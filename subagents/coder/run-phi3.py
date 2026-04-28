@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import os
+import os.path
 """Coder Agent with Phi3 (Microsoft) - Better quality than 0.5B"""
 import json, subprocess, sys, os, time
 
-WORKSPACE = '/home/dell/.openclaw/workspace'
+WORKSPACE = os.path.expanduser('~/.openclaw/workspace')
 MODEL = 'phi3:mini'
 
 def log_metrics(task_id, tokens_in, tokens_out, eval_time):

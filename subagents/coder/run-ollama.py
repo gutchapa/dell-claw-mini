@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+import os
+import os.path
 """Real Coder Agent with Ollama Backend"""
 import json, subprocess, sys, os, time
 
-WORKSPACE = '/home/dell/.openclaw/workspace'
+WORKSPACE = os.path.expanduser('~/.openclaw/workspace')
 
 def log_metrics(task_id, agent, model, tokens_in, tokens_out, eval_time, cost):
     subprocess.run([f'{WORKSPACE}/llm-observability.sh', 'log', task_id, agent, model, 

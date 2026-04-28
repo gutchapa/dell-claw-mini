@@ -7,7 +7,7 @@ import os
 class OllamaLLM:
     def __init__(self, model="phi3:mini"):
         self.model = model
-        self.workspace = os.environ.get('WORKSPACE', '/home/dell/.openclaw/workspace')
+        self.workspace = os.environ.get('WORKSPACE', os.path.expanduser('~/.openclaw/workspace'))
     
     def call(self, prompt, **kwargs):
         task_id = f"crewai_{hash(prompt) & 0xFFFFFFFF}"
